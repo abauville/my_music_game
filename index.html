@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>My music game</title>
+</head>
+
+<body>
+    <button id="do">Do</button>
+    <button id="re">Re</button>
+    <button id="mi">Mi</button>
+    <button id="stop">stop</button>
+</body>
+
+</html>
+<script>
+
+    // var context = new AudioContext();
+    // var o = context.createOscillator();
+    // o.frequency.setTargetAtTime(440, context.currentTime, 0);
+    // o.connect(context.destination);
+    // o.start(0);
+
+
+    // =======-
+    var context = null;
+    var oscillator = null;  
+    var gainNode = null;
+    function getOrCreateContext() {
+        if (!context) {
+            context = new AudioContext();
+            oscillator = context.createOscillator();
+            gainNode = context.createGain();
+            gainNode.gain.setValueAtTime(0.001, context.currentTime); 
+            oscillator.connect(gainNode);
+            gainNode.connect(context.destination);
+            oscillator.start(0);
+            isStarted = true; 
+            // gainNode.gain.setValueAtTime(gainNode.gain.value, context.currentTime); 
+            // gainNode.gain.exponentialRampToValueAtTime(0.0001, context.currentTime + 0.02);
+        }
+        return context;
+
+    }
+
+    var isStarted = false;
+    function playSound(m, type) {
+        getOrCreateContext();
+        // oscillator.start(0);
+        
+        oscillator.frequency.setTargetAtTime(Math.pow(2,(m-69)/12)*440, context.currentTime, 0);
+        gainNode.gain.setValueAtTime(gainNode.gain.value, context.currentTime); 
+        gainNode.gain.exponentialRampToValueAtTime(0.5, context.currentTime + 0.02);
+        // gainNode.gain.linearRampToValueAtTime(1.0, context.currentTime + 0.1);
+        // oscillator.start(0);
+        if (!isStarted) {
+            oscillator.start(0);
+            isStarted = true;
+        } else {
+            context.resume();
+        }
+    }
+
+    function stopSound() {
+        // Important! Setting a scheduled parameter value
+        gainNode.gain.setValueAtTime(gainNode.gain.value, context.currentTime); 
+        // let val = gainNode.gain.getValueAtTime(gainNode.gain.value, context.currentTime); 
+
+        gainNode.gain.exponentialRampToValueAtTime(0.0001, context.currentTime + 0.02);
+        // oscillator.stop();
+        // oscillator.isStarted=false;
+        // context.suspend();
+        // gainNode.gain.setValueAtTime(val, context.currentTime); 
+        
+    }
+
+    document.getElementById('do').addEventListener('mousedown', playSound.bind(null, 60, 'square'));
+    document.getElementById('re').addEventListener('mousedown', playSound.bind(null, 62, 'square'));
+    document.getElementById('mi').addEventListener('mousedown', playSound.bind(null, 64, 'square'));
+    document.getElementById('stop').addEventListener('click', stopSound);
+    document.getElementById('do').addEventListener('mouseup', stopSound);
+    document.getElementById('re').addEventListener('mouseup', stopSound);
+    document.getElementById('mi').addEventListener('mouseup', stopSound);
+</script>
