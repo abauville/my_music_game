@@ -8,79 +8,181 @@
 </head>
 
 <body>
-    <button id="do">Do</button>
-    <button id="re">Re</button>
-    <button id="mi">Mi</button>
-    <button id="stop">stop</button>
+    <style>
+        html {
+            background-color:rgb(32, 37, 44);
+        }
+        button {
+            background-color: rgb(0, 217, 255);
+            height: 40px;
+            width: 40px;            
+        }
+
+        button:hover{
+            background-color: rgb(150, 217, 255);
+        }
+        button:active{
+            background-color: rgb(200, 255, 255);
+        }
+
+        .right_answer:active {
+            background-color: green;
+        }
+
+        .wrong_answer:active {
+            background-color: red;
+        }
+
+        p {
+            color: white;
+        }
+
+        #start {
+            width: 50px;
+            background-color: gray;
+            text-align: center;
+        }
+
+        div{
+            text-align: center;
+        }
+
+    </style>
+
+    <div>
+        <input type="checkbox" id="play_sound_checkbox" name="play_sound"
+            checked>
+        <label for="scales">Play sound on button click</label>
+    </div>
+  
+
+    <div id="start-div">
+        <button id="start">start</button>
+        <!-- <button id="listen">listen</button> -->
+    </div>
+    <div>
+        <button id="do">Do</button>
+        <button id="re">Re</button>
+        <button id="mi">Mi</button>
+        <button id="fa">Fa</button>
+        <button id="so">So</button>
+        <button id="la">La</button>
+        <button id="ti">Ti</button>
+        <button id="DO">Do</button>
+    </div>
+    <div><p id="answer_p">Click start</p></div>
+
+    <div style="text-align: left;">
+        <h3>To do</h3>
+        <ul>
+            <li> Add a check box to play or not the buttons on click</li>
+            <li> Add a button to play the cadence</li>
+            <li> Add a slider to define how often to play the cadence</li>
+            <li> Add a check box to play the sequence back to DO</li>
+            <li>implement the playing of the sequence back to DO</li>
+            <li>implement the playing of the cadence</li>
+        </ul>
+    </div>
+
+
+    
 </body>
 
 </html>
+<script src="scripts/sound.js"></script>
 <script>
+    let answer_p = document.getElementById('answer_p');
+    // Button event listeners
+    let notes    = ['do', 're', 'mi', 'fa', 'so', 'la', 'ti', 'DO'];
+    let midi_num = [60, 62, 64, 65, 67, 69, 71, 72];
+    let I;
 
-    // var context = new AudioContext();
-    // var o = context.createOscillator();
-    // o.frequency.setTargetAtTime(440, context.currentTime, 0);
-    // o.connect(context.destination);
-    // o.start(0);
-
-
-    // =======-
-    var context = null;
-    var oscillator = null;  
-    var gainNode = null;
-    function getOrCreateContext() {
-        if (!context) {
-            context = new AudioContext();
-            oscillator = context.createOscillator();
-            gainNode = context.createGain();
-            gainNode.gain.setValueAtTime(0.001, context.currentTime); 
-            oscillator.connect(gainNode);
-            gainNode.connect(context.destination);
-            oscillator.start(0);
-            isStarted = true; 
-            // gainNode.gain.setValueAtTime(gainNode.gain.value, context.currentTime); 
-            // gainNode.gain.exponentialRampToValueAtTime(0.0001, context.currentTime + 0.02);
+    // Event listeners
+    switch_play_sound_on_off(); // add/remove event listeners to play sound on mousedown/up
+    document.getElementById('play_sound_checkbox').onchange = switch_play_sound_on_off;
+    document.getElementById('start').onclick = start;
+    
+    
+    function switch_play_sound_on_off() {
+        console.log("switch play sound on off");
+        let play_sound = document.getElementById('play_sound_checkbox').checked;
+        for (let i=0; i<notes.length;i++) {
+            let m = midi_num[i];
+            let elem = document.getElementById(notes[i])
+            if  (play_sound) {
+            
+                elem.onmousedown = playSound.bind(null, m, 'square');
+                elem.onmouseup   = stopSound;
+                elem.onclick = answer;
+            } else {
+                elem.onmousedown = function () {};
+                elem.onmouseup = function () {};
+            }
         }
-        return context;
-
     }
 
-    var isStarted = false;
-    function playSound(m, type) {
-        getOrCreateContext();
-        // oscillator.start(0);
+    function getRandomInt(max) {
+        return Math.floor(Math.random() * max);
+    }
+
+    function start(){
+        new_game();
+        let elem = document.getElementById('start');
+        elem.addEventListener('click', listen);
+        elem.innerHTML = "listen";
         
-        oscillator.frequency.setTargetAtTime(Math.pow(2,(m-69)/12)*440, context.currentTime, 0);
-        gainNode.gain.setValueAtTime(gainNode.gain.value, context.currentTime); 
-        gainNode.gain.exponentialRampToValueAtTime(0.5, context.currentTime + 0.02);
-        // gainNode.gain.linearRampToValueAtTime(1.0, context.currentTime + 0.1);
-        // oscillator.start(0);
-        if (!isStarted) {
-            oscillator.start(0);
-            isStarted = true;
+    }
+    // Setup state
+    function new_game() {
+        console.log("New game");
+        console.log("---");
+        answer_p.innerHTML= "Hmmmm....";
+
+
+        I = getRandomInt(notes.length-1); // random number
+        // playSound.bind(null, m, 'square');
+        
+        
+        playSound(midi_num[I], 'square');
+        setTimeout(() => {  stopSound(); }, 1000);
+        
+        for (let i=0; i<notes.length;i++) {
+            let elem = document.getElementById(notes[i]);
+            // clean
+            if (elem.classList.contains("right_answer")) {
+                elem.classList.remove("right_answer")
+            }
+            if (elem.classList.contains("wrong_answer")) {
+                elem.classList.remove("wrong_answer")
+            }
+
+            // modify classes based on the note to guess
+            if (i==I){
+                elem.classList.add("right_answer");
+            } else {
+                elem.classList.add("wrong_answer");
+            }   
+        }
+    }
+
+    function answer() {
+        if (this.classList.contains("right_answer")) {
+            console.log("Bravo");
+            answer_p.innerHTML= "Bravo!";
+            setTimeout(() => {  new_game(); }, 1000);
+        } else if (this.classList.contains("wrong_answer")) {
+            console.log("Booboo");
+            answer_p.innerHTML= "Booboo!";
         } else {
-            context.resume();
+            console.log("The class of this button is unknown, or unset.")
         }
     }
-
-    function stopSound() {
-        // Important! Setting a scheduled parameter value
-        gainNode.gain.setValueAtTime(gainNode.gain.value, context.currentTime); 
-        // let val = gainNode.gain.getValueAtTime(gainNode.gain.value, context.currentTime); 
-
-        gainNode.gain.exponentialRampToValueAtTime(0.0001, context.currentTime + 0.02);
-        // oscillator.stop();
-        // oscillator.isStarted=false;
-        // context.suspend();
-        // gainNode.gain.setValueAtTime(val, context.currentTime); 
+    
+    function listen(){
+        console.log(I);
+        playSound(midi_num[I], 'square');
+        setTimeout(() => {  stopSound(); }, 1000);
         
     }
 
-    document.getElementById('do').addEventListener('mousedown', playSound.bind(null, 60, 'square'));
-    document.getElementById('re').addEventListener('mousedown', playSound.bind(null, 62, 'square'));
-    document.getElementById('mi').addEventListener('mousedown', playSound.bind(null, 64, 'square'));
-    document.getElementById('stop').addEventListener('click', stopSound);
-    document.getElementById('do').addEventListener('mouseup', stopSound);
-    document.getElementById('re').addEventListener('mouseup', stopSound);
-    document.getElementById('mi').addEventListener('mouseup', stopSound);
 </script>
