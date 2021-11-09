@@ -1,0 +1,24 @@
+<!-- <script src="https://unpkg.com/tone"></script> -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.32/Tone.js"></script>
+<button id="play-button">Play/Pause</button>
+
+<p id="output"></p>
+
+<script>
+    
+    const synth = new Tone.Synth().toDestination();
+    
+    const now = Tone.now()
+    synth.triggerAttackRelease("C4", "8n", now)
+    synth.triggerAttackRelease("E4", "8n", now + 0.5)
+    synth.triggerAttackRelease("G4", "8n", now + 1)
+
+    document.getElementById("output").innerText = 'click start';
+    document.getElementById("play-button").addEventListener("click", async () => {
+        await Tone.start();
+	    document.getElementById("output").innerText = 'audio is ready.';
+    });
+
+
+
+</script> 

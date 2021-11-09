@@ -61,26 +61,29 @@
         <!-- <button id="listen">listen</button> -->
     </div>
     <div>
-        <button id="do">Do</button>
-        <button id="re">Re</button>
-        <button id="mi">Mi</button>
-        <button id="fa">Fa</button>
-        <button id="so">So</button>
-        <button id="la">La</button>
-        <button id="ti">Ti</button>
-        <button id="DO">Do</button>
+        
+
+        <button id="do" data-note="">Do</button>
+        <button id="re" data-note="">Re</button>
+        <button id="mi" data-note="">Mi</button>
+        <button id="fa" data-note="">Fa</button>
+        <button id="so" data-note="">So</button>
+        <button id="la" data-note="">La</button>
+        <button id="ti" data-note="">Ti</button>
+        <button id="DO" data-note="">Do</button>
     </div>
     <div><p id="answer_p">Click start</p></div>
 
     <div style="text-align: left;">
         <h3>To do</h3>
         <ul>
-            <li> Add a check box to play or not the buttons on click</li>
+            <li> Fix the sequence playing and the waiting time before next game starts</li>
             <li> Add a button to play the cadence</li>
             <li> Add a slider to define how often to play the cadence</li>
             <li> Add a check box to play the sequence back to DO</li>
             <li>implement the playing of the sequence back to DO</li>
             <li>implement the playing of the cadence</li>
+            <li> <strike>Add a check box to play or not the buttons on click</strike></li>
         </ul>
     </div>
 
@@ -89,36 +92,29 @@
 </body>
 
 </html>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.32/Tone.js"></script>
 <script src="scripts/sound.js"></script>
 <script>
+    const synth = new Tone.Synth().toDestination();    
     let answer_p = document.getElementById('answer_p');
     // Button event listeners
     let notes    = ['do', 're', 'mi', 'fa', 'so', 'la', 'ti', 'DO'];
+    let note2ind = {};
+    for (let i=0; i<notes.length;i++) {
+        note2ind[notes[i]] = i;
+    }
     let midi_num = [60, 62, 64, 65, 67, 69, 71, 72];
+    let note_names = ['C4', 'D4', 'E4', 'F4', 'G4', 'A4', 'B4', 'C5'];
+    
     let I;
 
-    // Event listeners
-    switch_play_sound_on_off(); // add/remove event listeners to play sound on mousedown/up
-    document.getElementById('play_sound_checkbox').onchange = switch_play_sound_on_off;
     document.getElementById('start').onclick = start;
     
-    
-    function switch_play_sound_on_off() {
-        console.log("switch play sound on off");
-        let play_sound = document.getElementById('play_sound_checkbox').checked;
-        for (let i=0; i<notes.length;i++) {
+    for (let i=0; i<notes.length;i++) {
             let m = midi_num[i];
             let elem = document.getElementById(notes[i])
-            if  (play_sound) {
-            
-                elem.onmousedown = playSound.bind(null, m, 'square');
-                elem.onmouseup   = stopSound;
-                elem.onclick = answer;
-            } else {
-                elem.onmousedown = function () {};
-                elem.onmouseup = function () {};
-            }
-        }
+            elem.dataset.note = note_names[i];
+            elem.onclick = answer;
     }
 
     function getRandomInt(max) {
@@ -126,9 +122,10 @@
     }
 
     function start(){
+        Tone.start();
         new_game();
         let elem = document.getElementById('start');
-        elem.addEventListener('click', listen);
+        elem.onclick =  listen;
         elem.innerHTML = "listen";
         
     }
@@ -140,11 +137,8 @@
 
 
         I = getRandomInt(notes.length-1); // random number
-        // playSound.bind(null, m, 'square');
         
-        
-        playSound(midi_num[I], 'square');
-        setTimeout(() => {  stopSound(); }, 1000);
+        synth.triggerAttackRelease(note_names[I], '4n');
         
         for (let i=0; i<notes.length;i++) {
             let elem = document.getElementById(notes[i]);
@@ -166,10 +160,16 @@
     }
 
     function answer() {
+        console.log("answer");
+        let play_sound = document.getElementById('play_sound_checkbox').checked;
+        if (play_sound) {
+            synth.triggerAttackRelease(this.dataset.note, '4n');
+        }
         if (this.classList.contains("right_answer")) {
             console.log("Bravo");
             answer_p.innerHTML= "Bravo!";
-            setTimeout(() => {  new_game(); }, 1000);
+            setTimeout(() => {  new_game(); }, 10000);
+            play_end_sequence ();
         } else if (this.classList.contains("wrong_answer")) {
             console.log("Booboo");
             answer_p.innerHTML= "Booboo!";
@@ -180,8 +180,31 @@
     
     function listen(){
         console.log(I);
-        playSound(midi_num[I], 'square');
-        setTimeout(() => {  stopSound(); }, 1000);
+        synth.triggerAttackRelease(note_names[I], '4n');
+    }
+
+    function play_end_sequence () {
+        let c=0;
+        Tone.Transport.stop();
+        let now = Tone.now()
+        if (I<4) {
+            
+            
+            for (let i=I; i>=0; i--) {
+                console.log(now+c);
+                console.log(note_names[i]);
+                synth.triggerAttackRelease(note_names[i], '8n', now+c);
+                c++;
+            }
+        } else {
+            for (let i=I; i<8; i++) {
+                console.log(now+c);
+                console.log(note_names[i]);
+                synth.triggerAttackRelease(note_names[i], '8n', now+c);
+                c++
+            }
+        }
+        Tone.Transport.start();
         
     }
 
