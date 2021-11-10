@@ -95,7 +95,10 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.32/Tone.js"></script>
 <script src="scripts/sound.js"></script>
 <script>
-    const synth = new Tone.Synth().toDestination();    
+    const synthRight = new Tone.Synth().toDestination();
+    const synthWrong = new Tone.Synth().toDestination();
+    // console.log(synth_right);
+
     let answer_p = document.getElementById('answer_p');
     // Button event listeners
     let notes    = ['do', 're', 'mi', 'fa', 'so', 'la', 'ti', 'DO'];
@@ -126,12 +129,12 @@
     function play_note() {
         console.log("play_sound", play_sound)
         if (play_sound) {
-            synth.triggerAttack(this.dataset.note);
+            synthRight.triggerAttack(this.dataset.note);
         }
     }
     function stop_note() {
         if (play_sound) {
-            synth.triggerRelease();
+            synthRight.triggerRelease();
         }
     }
 
@@ -158,7 +161,7 @@
 
         I = getRandomInt(notes.length-1); // random number
         
-        synth.triggerAttackRelease(note_names[I], '4n');
+        synthRight.triggerAttackRelease(note_names[I], '4n');
         
         for (let i=0; i<notes.length;i++) {
             let elem = document.getElementById(notes[i]);
@@ -191,18 +194,19 @@
             // new_game();
         } else if (this.classList.contains("wrong_answer")) {
             if (play_sound) {
-                synth.triggerAttackRelease(this.dataset.note, '4n');
+                synthWrong.triggerAttackRelease(this.dataset.note, '4n');
             }
             console.log("Booboo");
             answer_p.innerHTML= "Booboo!";
         } else {
+            synthRight.triggerAttackRelease(this.dataset.note, '4n');
             console.log("The class of this button is unknown, or unset.")
         }
     }
     
     function listen(){
         console.log(I);
-        synth.triggerAttackRelease(note_names[I], '4n');
+        synthRight.triggerAttackRelease(note_names[I], '4n');
     }
 
     function play_end_sequence () {
@@ -225,7 +229,7 @@
         }
         
         const seq = new Tone.Part(
-            (time, note) => {synth.triggerAttackRelease(note, 0.8*note_length, time);}, 
+            (time, note) => {synthRight.triggerAttackRelease(note, 0.8*note_length, time);}, 
             note_seq,
             );
         seq.start();
