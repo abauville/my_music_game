@@ -63,14 +63,14 @@
     <div>
         
 
-        <button id="do" data-note="">Do</button>
-        <button id="re" data-note="">Re</button>
-        <button id="mi" data-note="">Mi</button>
-        <button id="fa" data-note="">Fa</button>
-        <button id="so" data-note="">So</button>
-        <button id="la" data-note="">La</button>
-        <button id="ti" data-note="">Ti</button>
-        <button id="DO" data-note="">Do</button>
+        <button id="do" data-note="" data-I="0">Do</button>
+        <button id="re" data-note="" data-I="1">Re</button>
+        <button id="mi" data-note="" data-I="2">Mi</button>
+        <button id="fa" data-note="" data-I="3">Fa</button>
+        <button id="so" data-note="" data-I="4">So</button>
+        <button id="la" data-note="" data-I="5">La</button>
+        <button id="ti" data-note="" data-I="6">Ti</button>
+        <button id="DO" data-note="" data-I="7">Do</button>
     </div>
     <div><p id="answer_p">Click start</p></div>
 
@@ -110,11 +110,29 @@
 
     document.getElementById('start').onclick = start;
     
+    let play_sound = document.getElementById('play_sound_checkbox').checked;
+
+    document.getElementById('play_sound_checkbox').onchange = () => {console.log("play_sound chaage"); play_sound = !play_sound};
+
     for (let i=0; i<notes.length;i++) {
             let m = midi_num[i];
             let elem = document.getElementById(notes[i])
             elem.dataset.note = note_names[i];
-            elem.onclick = answer;
+            elem.onmousedown = answer;//play_note;
+            // elem.onmouseup = stop_note;
+            // elem.onclick = answer;
+    }
+
+    function play_note() {
+        console.log("play_sound", play_sound)
+        if (play_sound) {
+            synth.triggerAttack(this.dataset.note);
+        }
+    }
+    function stop_note() {
+        if (play_sound) {
+            synth.triggerRelease();
+        }
     }
 
     function getRandomInt(max) {
@@ -144,7 +162,6 @@
         
         for (let i=0; i<notes.length;i++) {
             let elem = document.getElementById(notes[i]);
-            // clean
             if (elem.classList.contains("right_answer")) {
                 elem.classList.remove("right_answer")
             }
@@ -163,7 +180,7 @@
 
     function answer() {
         console.log("answer");
-        let play_sound = document.getElementById('play_sound_checkbox').checked;
+        
         
         if (this.classList.contains("right_answer")) {
             console.log("Bravo");
