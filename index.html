@@ -122,7 +122,8 @@
     }
 
     function start(){
-        Tone.start();
+        // Tone.start();
+        Tone.Transport.start()
         new_game();
         let elem = document.getElementById('start');
         elem.onclick =  listen;
@@ -134,6 +135,7 @@
         console.log("New game");
         console.log("---");
         answer_p.innerHTML= "Hmmmm....";
+        console.log(Tone.Transport.state)
 
 
         I = getRandomInt(notes.length-1); // random number
@@ -162,15 +164,18 @@
     function answer() {
         console.log("answer");
         let play_sound = document.getElementById('play_sound_checkbox').checked;
-        if (play_sound) {
-            synth.triggerAttackRelease(this.dataset.note, '4n');
-        }
+        
         if (this.classList.contains("right_answer")) {
             console.log("Bravo");
             answer_p.innerHTML= "Bravo!";
-            setTimeout(() => {  new_game(); }, 10000);
-            play_end_sequence ();
+            // 
+            wait_time = play_end_sequence ();
+            setTimeout(() => {  new_game(); }, wait_time);
+            // new_game();
         } else if (this.classList.contains("wrong_answer")) {
+            if (play_sound) {
+                synth.triggerAttackRelease(this.dataset.note, '4n');
+            }
             console.log("Booboo");
             answer_p.innerHTML= "Booboo!";
         } else {
@@ -184,27 +189,33 @@
     }
 
     function play_end_sequence () {
-        let c=0;
-        Tone.Transport.stop();
+        let wait_time=0;
         let now = Tone.now()
+        let note_seq = [];
+        note_length = 0.75;
+
+        let i_end, i_mod;
         if (I<4) {
-            
-            
-            for (let i=I; i>=0; i--) {
-                console.log(now+c);
-                console.log(note_names[i]);
-                synth.triggerAttackRelease(note_names[i], '8n', now+c);
-                c++;
-            }
+            i_end = -1;  i_mod = -1;
         } else {
-            for (let i=I; i<8; i++) {
-                console.log(now+c);
-                console.log(note_names[i]);
-                synth.triggerAttackRelease(note_names[i], '8n', now+c);
-                c++
-            }
+            i_end =8;  i_mod = 1;   
         }
+        console.log(i_end, i_mod)
+        for (let i=I; i!==i_end; i+=i_mod) {
+            console.log(i);
+            note_seq.push([wait_time, note_names[i]]);
+            wait_time+=note_length;
+        }
+        
+        const seq = new Tone.Part(
+            (time, note) => {synth.triggerAttackRelease(note, 0.8*note_length, time);}, 
+            note_seq,
+            );
+        seq.start();
+        console.log(Tone.Transport.state);
+        
         Tone.Transport.start();
+        return Tone.Transport.toSeconds(wait_time+1.0)*1000
         
     }
 

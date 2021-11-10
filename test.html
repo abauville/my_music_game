@@ -9,9 +9,15 @@
     const synth = new Tone.Synth().toDestination();
     
     const now = Tone.now()
-    synth.triggerAttackRelease("C4", "8n", now)
-    synth.triggerAttackRelease("E4", "8n", now + 0.5)
-    synth.triggerAttackRelease("G4", "8n", now + 1)
+    // synth.triggerAttackRelease("C4", "8n", now)
+    // synth.triggerAttackRelease("E4", "8n", now + 0.5)
+    // synth.triggerAttackRelease("G4", "8n", now + 1)
+
+    const seq = new Tone.Part((time, note) => {
+	synth.triggerAttackRelease(note, 0.1, time);
+	// subdivisions are given as subarrays
+}, [[0, "C4"], [1, "D4"]]).start(0);
+Tone.Transport.start();
 
     document.getElementById("output").innerText = 'click start';
     document.getElementById("play-button").addEventListener("click", async () => {
