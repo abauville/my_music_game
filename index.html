@@ -5,200 +5,10 @@
 <head>
     <meta charset="utf-8">
     <title>My music game</title>
+    <link rel="stylesheet" href="styles/styles.css">
 </head>
 
 <body>
-    <style>
-        html {
-            background-color:rgb(32, 37, 44);
-        }
-
-        button.note {
-            background-color: rgb(80, 215, 255);
-            height: 40px;
-            width: 40px;            
-            border-radius: 20%;
-            border-width: 2px;
-            border-color: rgb(80, 215, 255);
-        }
-
-        button.note:hover{
-            background-color: rgb(150, 230, 255);
-            border-color: rgb(150, 230, 255);
-        }
-        button.note:active{
-            background-color: rgb(200, 255, 255);
-            border-color: rgb(200, 255, 255);
-        }
-
-        .right_answer.revealed {
-            background-color: rgb(113, 236, 113);
-            border-color: rgb(113, 236, 113);
-            animation: flash_right_answer 1 0.75s;
-        }
-        @keyframes flash_right_answer { 
-            from { background-color: rgb(183, 255, 183); 
-                   border-color:     rgb(183, 255, 183); }
-            to   { background-color: rgb(113, 236, 113);
-                   border-color:     rgb(113, 236, 113); }
-        }
-
-        .right_answer.revealed:hover {
-            background-color: rgb(133, 255, 133);
-            border-color: rgb(133, 255, 133);
-        }
-
-        .wrong_answer.revealed {
-            background-color: rgb(255, 129, 129);
-            border-color: rgb(255, 129, 129);
-            animation: flash_wrong_answer 1 3.0s;
-        }
-        @keyframes flash_wrong_answer { 
-            from { background-color: rgb(40,0,0); 
-                   border-color:     rgb(40,0,0); 
-                   }
-            to   { background-color: rgb(255, 129, 129);
-                   border-color:     rgb(255, 129, 129); }
-        }
-
-        .wrong_answer.revealed:hover {
-            background-color: rgb(255, 159, 159);
-            border-color: rgb(255, 159, 159);
-        }
-
-        button.note.sequence {
-            background-color: rgb(150, 255, 230);
-            border-color: rgb(150, 255, 230);
-            animation: flash_sequence 1 0.75s;
-        }
-        @keyframes flash_sequence { 
-            from { background-color: rgb(230, 255, 240); 
-                   border-color:     rgb(230, 255, 255); }
-            to   { background-color: rgb(150, 255, 230);
-                   border-color:     rgb(150, 255, 230); }
-        }
-
-        p {
-            color: white;
-        }
-
-        #start {
-            height: 55px;
-            width: 110px;
-            margin: 10px;
-            border-radius: 10px 10px 10px 10px;
-            text-align: center;
-            line-height: 130%;
-        }
-
-        #start.start {
-            background-color: rgb(248, 255, 150);
-            border-color: rgb(248, 255, 150);
-        } 
-
-        #start:hover {
-            content: "listen";
-            background-color: rgb(255, 255, 220);
-        }
-
-        #start.wrong_answer {
-            background-color: rgb(255, 129, 129);
-            border-color: rgb(255, 129, 129);
-            margin-left: 10px;
-            margin-right: 10px;
-            animation: flash_wrong_answer 1 0.5s, shake 3 .1s;
-        }
-        @keyframes shake{
-            
-            25% {
-                transform: translateX(-3px);
-            }
-            75% {
-                transform: translateX(3px);
-            }
-            
-        }
-
-        #start.wrong_answer:hover {
-            background-color: rgb(255, 159, 159);
-            border-color: rgb(255, 159, 159);
-        }
-
-        #start.new_game {
-            background-color:rgb(255, 237, 163);
-            border-color:rgb(255, 237, 163);
-        }
-
-        #start.wonder {
-            background-color:rgb(236, 197, 113);
-            border-color:rgb(236, 197, 113);
-        }
-
-        #start.wonder:hover {
-            background-color:rgb(255, 227, 143);
-            border-color:rgb(255, 227, 143);
-        }
- 
-        #start.right_answer {
-            background-color: rgb(113, 236, 113);
-            border-color: rgb(133, 236, 133);
-            animation: flash_right_answer 1 0.5s, bounce infinite 1.0s;
-        }
-        @keyframes bounce{
-            
-            50% {
-                transform: translateY(-2px);
-            }
-            /* 75% {
-                transform: translateY(3px);
-            } */
-            
-        }
-
-        div{
-            text-align: center;
-        }
-
-        span.greeting_emoji::before {
-            content: "(￣▽￣)ノﾞ";
-            animation: greeting_emoji infinite 1s;
-        }
-    
-        @keyframes greeting_emoji {
-    
-            /* 0% {
-                content: "(⇀_⇀)";
-            } */
-    
-            50% {
-                content: "(￣▽￣)ﾉﾞ";
-            }
-
-
-        }
-        
-
-        span.wondering_emoji::before {
-            content: "(⇀_⇀)";
-            animation: wondering_emoji infinite 3s;
-        }
-    
-        @keyframes wondering_emoji {
-    
-            /* 0% {
-                content: "(⇀_⇀)";
-            } */
-    
-            50% {
-                content: "(↼_↼)";
-            }
-
-        }
-
-        
-        
-
-    </style>
 
     <div style="text-align: left; margin-left:100px">
         <input type="checkbox" id="play_sound_checkbox" name="play_sound"
@@ -236,13 +46,13 @@
             
             
             
-            
-            <li> change the color of the start button depending on emoji</li>
+            <li> block button clicks while the sequence is playing </li>
             <li> print "listen again" in start button on hover</li>
-            <li> shake the emoji (or the div) when a wrong note is played </li>
             <li> implement the playing of the cadence</li>
             <li> Add a button to play the cadence</li>
             <li> Add a slider to define how often to play the cadence</li>
+            <li> <strike>shake the emoji (or the div) when a wrong note is played</strike> </li>
+            <li> <strike>change the color of the start button depending on emoji</strike></li>
             <li> <strike>flash the wrong note</strike> </li>
             <li> <strike>leave the note in red when a wrong answer is inputted</strike> </li>
             <li> <strike>animate the sequence to flash when the note is played</strike></li>
