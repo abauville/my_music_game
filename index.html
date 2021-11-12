@@ -12,25 +12,70 @@
         html {
             background-color:rgb(32, 37, 44);
         }
-        button {
-            background-color: rgb(0, 217, 255);
+
+        button.note {
+            background-color: rgb(80, 215, 255);
             height: 40px;
             width: 40px;            
+            border-radius: 20%;
+            border-width: 2px;
+            border-color: rgb(80, 215, 255);
         }
 
-        button:hover{
-            background-color: rgb(150, 217, 255);
+        button.note:hover{
+            background-color: rgb(150, 230, 255);
+            border-color: rgb(150, 230, 255);
         }
-        button:active{
+        button.note:active{
             background-color: rgb(200, 255, 255);
+            border-color: rgb(200, 255, 255);
         }
 
-        .right_answer:active {
-            background-color: green;
+        .right_answer.revealed {
+            background-color: rgb(113, 236, 113);
+            border-color: rgb(113, 236, 113);
+            animation: flash_right_answer 1 0.75s;
+        }
+        @keyframes flash_right_answer { 
+            from { background-color: rgb(183, 255, 183); 
+                   border-color:     rgb(183, 255, 183); }
+            to   { background-color: rgb(113, 236, 113);
+                   border-color:     rgb(113, 236, 113); }
         }
 
-        .wrong_answer:active {
-            background-color: red;
+        .right_answer.revealed:hover {
+            background-color: rgb(133, 255, 133);
+            border-color: rgb(133, 255, 133);
+        }
+
+        .wrong_answer.revealed {
+            background-color: rgb(255, 129, 129);
+            border-color: rgb(255, 129, 129);
+            animation: flash_wrong_answer 1 3.0s;
+        }
+        @keyframes flash_wrong_answer { 
+            from { background-color: rgb(40,0,0); 
+                   border-color:     rgb(40,0,0); 
+                   }
+            to   { background-color: rgb(255, 129, 129);
+                   border-color:     rgb(255, 129, 129); }
+        }
+
+        .wrong_answer.revealed:hover {
+            background-color: rgb(255, 159, 159);
+            border-color: rgb(255, 159, 159);
+        }
+
+        button.note.sequence {
+            background-color: rgb(150, 255, 230);
+            border-color: rgb(150, 255, 230);
+            animation: flash_sequence 1 0.75s;
+        }
+        @keyframes flash_sequence { 
+            from { background-color: rgb(230, 255, 240); 
+                   border-color:     rgb(230, 255, 255); }
+            to   { background-color: rgb(150, 255, 230);
+                   border-color:     rgb(150, 255, 230); }
         }
 
         p {
@@ -38,52 +83,174 @@
         }
 
         #start {
-            width: 50px;
-            background-color: gray;
+            height: 55px;
+            width: 110px;
+            margin: 10px;
+            border-radius: 10px 10px 10px 10px;
             text-align: center;
+            line-height: 130%;
+        }
+
+        #start.start {
+            background-color: rgb(248, 255, 150);
+            border-color: rgb(248, 255, 150);
+        } 
+
+        #start:hover {
+            content: "listen";
+            background-color: rgb(255, 255, 220);
+        }
+
+        #start.wrong_answer {
+            background-color: rgb(255, 129, 129);
+            border-color: rgb(255, 129, 129);
+            margin-left: 10px;
+            margin-right: 10px;
+            animation: flash_wrong_answer 1 0.5s, shake 3 .1s;
+        }
+        @keyframes shake{
+            
+            25% {
+                transform: translateX(-3px);
+            }
+            75% {
+                transform: translateX(3px);
+            }
+            
+        }
+
+        #start.wrong_answer:hover {
+            background-color: rgb(255, 159, 159);
+            border-color: rgb(255, 159, 159);
+        }
+
+        #start.new_game {
+            background-color:rgb(255, 237, 163);
+            border-color:rgb(255, 237, 163);
+        }
+
+        #start.wonder {
+            background-color:rgb(236, 197, 113);
+            border-color:rgb(236, 197, 113);
+        }
+
+        #start.wonder:hover {
+            background-color:rgb(255, 227, 143);
+            border-color:rgb(255, 227, 143);
+        }
+ 
+        #start.right_answer {
+            background-color: rgb(113, 236, 113);
+            border-color: rgb(133, 236, 133);
+            animation: flash_right_answer 1 0.5s, bounce infinite 1.0s;
+        }
+        @keyframes bounce{
+            
+            50% {
+                transform: translateY(-2px);
+            }
+            /* 75% {
+                transform: translateY(3px);
+            } */
+            
         }
 
         div{
             text-align: center;
         }
 
-    </style>
+        span.greeting_emoji::before {
+            content: "(￣▽￣)ノﾞ";
+            animation: greeting_emoji infinite 1s;
+        }
+    
+        @keyframes greeting_emoji {
+    
+            /* 0% {
+                content: "(⇀_⇀)";
+            } */
+    
+            50% {
+                content: "(￣▽￣)ﾉﾞ";
+            }
 
-    <div>
-        <input type="checkbox" id="play_sound_checkbox" name="play_sound"
-            checked>
-        <label for="scales">Play sound on button click</label>
-    </div>
-  
 
-    <div id="start-div">
-        <button id="start">start</button>
-        <!-- <button id="listen">listen</button> -->
-    </div>
-    <div>
+        }
         
 
-        <button id="do" data-note="" data-I="0">Do</button>
-        <button id="re" data-note="" data-I="1">Re</button>
-        <button id="mi" data-note="" data-I="2">Mi</button>
-        <button id="fa" data-note="" data-I="3">Fa</button>
-        <button id="so" data-note="" data-I="4">So</button>
-        <button id="la" data-note="" data-I="5">La</button>
-        <button id="ti" data-note="" data-I="6">Ti</button>
-        <button id="DO" data-note="" data-I="7">Do</button>
+        span.wondering_emoji::before {
+            content: "(⇀_⇀)";
+            animation: wondering_emoji infinite 3s;
+        }
+    
+        @keyframes wondering_emoji {
+    
+            /* 0% {
+                content: "(⇀_⇀)";
+            } */
+    
+            50% {
+                content: "(↼_↼)";
+            }
+
+        }
+
+        
+        
+
+    </style>
+
+    <div style="text-align: left; margin-left:100px">
+        <input type="checkbox" id="play_sound_checkbox" name="play_sound"
+            checked>
+        <label for="play_sound">Play sound on button click</label>
+        <br>
+        <input type="checkbox" id="play_end_sequence_checkbox" name="play_end_sequence"
+            checked>
+        <label for="play_end_sequence">Play the sequence to DO</label>
     </div>
-    <div><p id="answer_p">Click start</p></div>
+  
+    <br>
+    <div id="start-div">
+        <button id="start" class="start"><span class=greeting_emoji></span><br>start</button>
+    </div>
+    <br>
+    <div class='div-note'>
+        <button id="do" class="note" data-note="" data-I="0">Do</button>
+        <button id="re" class="note" data-note="" data-I="1">Re</button>
+        <button id="mi" class="note" data-note="" data-I="2">Mi</button>
+        <button id="fa" class="note" data-note="" data-I="3">Fa</button>
+        <button id="so" class="note" data-note="" data-I="4">So</button>
+        <button id="la" class="note" data-note="" data-I="5">La</button>
+        <button id="ti" class="note" data-note="" data-I="6">Ti</button>
+        <button id="DO" class="note" data-note="" data-I="7">Do</button>
+    </div>
+    <!-- <div><p id="answer_p">Click start</p></div> -->
+
+    <br>
 
     <div style="text-align: left;">
         <h3>To do</h3>
         <ul>
-            <li> Fix the sequence playing and the waiting time before next game starts</li>
+            
+            
+            
+            
+            
+            <li> change the color of the start button depending on emoji</li>
+            <li> print "listen again" in start button on hover</li>
+            <li> shake the emoji (or the div) when a wrong note is played </li>
+            <li> implement the playing of the cadence</li>
             <li> Add a button to play the cadence</li>
             <li> Add a slider to define how often to play the cadence</li>
-            <li> Add a check box to play the sequence back to DO</li>
-            <li>implement the playing of the sequence back to DO</li>
-            <li>implement the playing of the cadence</li>
-            <li> <strike>Add a check box to play or not the buttons on click</strike></li>
+            <li> <strike>flash the wrong note</strike> </li>
+            <li> <strike>leave the note in red when a wrong answer is inputted</strike> </li>
+            <li> <strike>animate the sequence to flash when the note is played</strike></li>
+            <li> <strike>Add a check box to play the sequence back to DO</strike></li>
+            <li> <strike>light up the buttons when the end sequence is played</strike></li>
+            <li> <strike>implement the playing of the sequence back to DO</strike></li>
+            <li ><strike>Fix the sequence playing and the waiting time before next game starts</strike></li>
+            <li ><strike>Add a check box to play or not the buttons on click</strike></li>
         </ul>
     </div>
 
@@ -97,7 +264,6 @@
 <script>
     const synthRight = new Tone.Synth().toDestination();
     const synthWrong = new Tone.Synth().toDestination();
-    // console.log(synth_right);
 
     let answer_p = document.getElementById('answer_p');
     // Button event listeners
@@ -113,64 +279,66 @@
 
     document.getElementById('start').onclick = start;
     
-    let play_sound = document.getElementById('play_sound_checkbox').checked;
 
-    document.getElementById('play_sound_checkbox').onchange = () => {console.log("play_sound chaage"); play_sound = !play_sound};
+
 
     for (let i=0; i<notes.length;i++) {
             let m = midi_num[i];
             let elem = document.getElementById(notes[i])
             elem.dataset.note = note_names[i];
-            elem.onmousedown = answer;//play_note;
-            // elem.onmouseup = stop_note;
-            // elem.onclick = answer;
+            elem.onmousedown = answer;
     }
 
-    function play_note() {
-        console.log("play_sound", play_sound)
-        if (play_sound) {
-            synthRight.triggerAttack(this.dataset.note);
-        }
-    }
-    function stop_note() {
-        if (play_sound) {
-            synthRight.triggerRelease();
-        }
-    }
+    // function play_note() {
+    //     console.log("play_sound", play_sound)
+    //     if (play_sound) {
+    //         synthRight.triggerAttack(this.dataset.note);
+    //     }
+    // }
+    // function stop_note() {
+    //     if (play_sound) {
+    //         synthRight.triggerRelease();
+    //     }
+    // }
 
     function getRandomInt(max) {
-        return Math.floor(Math.random() * max);
+        return Math.round(Math.random() * max);
     }
 
     function start(){
+        
         // Tone.start();
         Tone.Transport.start()
+        // wait_time = play_end_sequence ();
+
         new_game();
-        let elem = document.getElementById('start');
-        elem.onclick =  listen;
-        elem.innerHTML = "listen";
+        document.getElementById('start').onclick =  listen;
         
     }
     // Setup state
-    function new_game() {
+    function new_game(new_I=true) {
         console.log("New game");
         console.log("---");
-        answer_p.innerHTML= "Hmmmm....";
+        // answer_p.innerHTML= "Hmmmm....";
+        
+        
         console.log(Tone.Transport.state)
 
-
-        I = getRandomInt(notes.length-1); // random number
-        
+        if (new_I) {
+            I = getRandomInt(notes.length-1); // random number
+        }
         synthRight.triggerAttackRelease(note_names[I], '4n');
+        // answer_p.innerHTML= "ヾ(´〇`)ﾉ♪♪♪";
         
+        
+        document.getElementById('start').innerHTML = "ヾ(´〇`)ﾉ♪♪♪";
+        document.getElementById('start').className="new_game";
+        setTimeout(() => {  document.getElementById('start').innerHTML= "<span class=wondering_emoji></span><br>listen again?"; document.getElementById('start').className="wonder";}, 1000);
+        
+
         for (let i=0; i<notes.length;i++) {
             let elem = document.getElementById(notes[i]);
-            if (elem.classList.contains("right_answer")) {
-                elem.classList.remove("right_answer")
-            }
-            if (elem.classList.contains("wrong_answer")) {
-                elem.classList.remove("wrong_answer")
-            }
+            elem.className = "note"; // clear the classList
 
             // modify classes based on the note to guess
             if (i==I){
@@ -184,20 +352,33 @@
     function answer() {
         console.log("answer");
         
-        
+        this.classList.add("revealed");
         if (this.classList.contains("right_answer")) {
             console.log("Bravo");
-            answer_p.innerHTML= "Bravo!";
-            // 
-            wait_time = play_end_sequence ();
+            document.getElementById('start').innerHTML= "＼(＾▽＾)／";
+            document.getElementById('start').className="right_answer";
+            this.classList.add("revealed");
+            if (document.getElementById('play_end_sequence_checkbox').checked) {
+                wait_time = play_end_sequence ();
+            } else {
+                synthRight.triggerAttackRelease(this.dataset.note, '4n');
+                wait_time = 2.0*1000.0;
+            }
             setTimeout(() => {  new_game(); }, wait_time);
             // new_game();
         } else if (this.classList.contains("wrong_answer")) {
-            if (play_sound) {
+            if (document.getElementById('play_sound_checkbox').checked) {
                 synthWrong.triggerAttackRelease(this.dataset.note, '4n');
             }
             console.log("Booboo");
-            answer_p.innerHTML= "Booboo!";
+            document.getElementById('start').innerHTML= "(＞﹏＜)";
+            document.getElementById('start').className="wrong_answer";
+            document.getElementById('start').style.animation="none";
+            document.getElementById('start').offsetHeight;
+            document.getElementById('start').style.animation="";
+            // setTimeout(() => {  document.getElementById('start').className="wrong_answer"; }, 1);
+            
+            this.classList.add("revealed");
         } else {
             synthRight.triggerAttackRelease(this.dataset.note, '4n');
             console.log("The class of this button is unknown, or unset.")
@@ -206,13 +387,15 @@
     
     function listen(){
         console.log(I);
-        synthRight.triggerAttackRelease(note_names[I], '4n');
+        new_game(new_I=false);
+        // synthRight.triggerAttackRelease(note_names[I], '4n');
     }
 
     function play_end_sequence () {
         let wait_time=0;
         let now = Tone.now()
         let note_seq = [];
+        let indices = [];
         note_length = 0.75;
 
         let i_end, i_mod;
@@ -224,12 +407,24 @@
         console.log(i_end, i_mod)
         for (let i=I; i!==i_end; i+=i_mod) {
             console.log(i);
+            indices.push(i);
             note_seq.push([wait_time, note_names[i]]);
             wait_time+=note_length;
         }
         
+        let counter = 0
         const seq = new Tone.Part(
-            (time, note) => {synthRight.triggerAttackRelease(note, 0.8*note_length, time);}, 
+            (time, note) => {
+                synthRight.triggerAttackRelease(note, 0.8*note_length, time);
+                console.log("event!!", counter, time, note);
+                let cl = document.getElementById(notes[indices[counter]]).classList;
+                if (cl.contains("wrong_answer")) {
+                    document.getElementById(notes[indices[counter]]).className = "note sequence";
+                    // document.getElementById(notes[indices[counter]]).classList.add("sequence");
+                }
+                counter++;
+
+                            }, 
             note_seq,
             );
         seq.start();
