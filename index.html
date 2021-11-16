@@ -44,8 +44,8 @@
         <ul>
             
             
-            
-            
+            <li>add keyboard eventlisteners to play the game with the keyboard</li>
+            <li>add a slider for the waiting time before the next game</li>
             <li> block button clicks while the sequence is playing </li>
             <li> print "listen again" in start button on hover</li>
             <li> implement the playing of the cadence</li>
@@ -171,8 +171,10 @@
             if (document.getElementById('play_end_sequence_checkbox').checked) {
                 wait_time = play_end_sequence ();
             } else {
-                synthRight.triggerAttackRelease(this.dataset.note, '4n');
-                wait_time = 2.0*1000.0;
+                if (document.getElementById('play_sound_checkbox').checked) {
+                    synthRight.triggerAttackRelease(this.dataset.note, '4n');
+                }
+                wait_time = 1.0*1000.0;
             }
             setTimeout(() => {  new_game(); }, wait_time);
             // new_game();
