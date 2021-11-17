@@ -10,6 +10,23 @@
 
 <body>
 
+    <style>
+        /* Cadence button */
+    /* ====================== */
+    #cadence {
+        height: 40px;
+        width: 120px;
+        margin: 10px;
+        border-radius: 10px 10px 10px 10px;
+        text-align: center;
+        font-family: var(--main-font-family);
+        font-variant-caps: small-caps;
+        font-weight: 500;
+        line-height: 150%;
+        background-color: aquamarine;
+        border-color: aquamarine;
+    }
+    </style>
     <div style="text-align: left; margin-left:100px">
         <input type="checkbox" id="play_sound_checkbox" name="play_sound"
             checked>
@@ -18,12 +35,24 @@
         <input type="checkbox" id="play_end_sequence_checkbox" name="play_end_sequence"
             checked>
         <label for="play_end_sequence">Play the sequence to DO</label>
+        
+            
+        <form id="game_form" style="text-align: left;"></form>
+                Game type:
+            <input type="radio" id="game_radio_note" name="game_radio" value="note"
+                checked>
+            <label for="game_radio_note">Note</label>
+            <input type="radio" id="game_radio_chord" name="game_radio" value="chord">
+            <label for="game_radio_chord">Chord</label>
+        </form>
+        
+        
+
     </div>
   
     <br>
     <div id="start-div">
         <button id="start" class="start"><span class=greeting_emoji></span><br>start</button>
-        
     </div>
     <br>
     <div class='div-note'>
@@ -39,7 +68,7 @@
 
     </br>
     <div>
-        <button id="cadence" class="cadence">Play the cadence</button>
+        <button id="cadence" class="cadence">Play cadence</button> 
         
     </div>
     <div><p id="answer_p">...</p></div>
@@ -49,15 +78,27 @@
     <div style="text-align: left;">
         <h3>To do</h3>
         <ul>
+            <li>Implement inversion and voice leading for chords (high proba for best voice leading, and lower proba for others (if always best, it will just be stuck in whatever inversion it started))</li>
+            <li>Implement markov chain to get more natural chord progressions</li>
+
             
             
             
-            
-            <li> implement the playing of the cadence</li>
-            <li> Add a button to play the cadence</li>
+            <li>play bass note in different instrument (+add option) for chord game</li>
+            <li>slider for volume of bass note</li>
+
+
             <li> Add a slider to define how often to play the cadence</li>
             <li>add a slider for the waiting time before the next game</li>
             <li> block button clicks while the sequence is playing </li>
+        </ul>
+        <!-- <h3>Done</h3>
+        <ul>
+            <li><strike>implement the chord game</strike></li>
+            <li><strike>change the button labels to I, ii etc... for chord game</strike></li> 
+            <li><strike>Add radio buttons for game type: *note, *chords</strike></li>
+            <li> <strike>Add a button to play the cadence</strike></li>
+            <li> <strike>implement the playing of the cadence</strike></li>
             <li><strike>add keyboard eventlisteners to play the game with the keyboard</strike></li>
             <li> <strike>shake the emoji (or the div) when a wrong note is played</strike> </li>
             <li> <strike>change the color of the start button depending on emoji</strike></li>
@@ -69,7 +110,7 @@
             <li> <strike>implement the playing of the sequence back to DO</strike></li>
             <li ><strike>Fix the sequence playing and the waiting time before next game starts</strike></li>
             <li ><strike>Add a check box to play or not the buttons on click</strike></li>
-        </ul>
+        </ul> -->
     </div>
 
 
@@ -80,15 +121,14 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.32/Tone.js"></script>
 <script src="scripts/sound.js"></script>
 <script>
-    const synthRight = new Tone.FMSynth().toDestination();
-    const synthWrong = new Tone.FMSynth().toDestination();
-
-
-
-    const synthChord = new Tone.PolySynth(Tone.FMSynth).toDestination();
-
-    synthRight.set({
-    "harmonicity":8,
+    // const synthRight = [new Tone.FMSynth().toDestination(),
+    //                     new Tone.FMSynth().toDestination(),
+    //                     new Tone.FMSynth().toDestination()]
+    // const synthWrong = [new Tone.FMSynth().toDestination(),
+    //                     new Tone.FMSynth().toDestination(),
+    //                     new Tone.FMSynth().toDestination()]
+    
+    synthRightDict = {"harmonicity":8,
     "modulationIndex": 2,
     "oscillator" : {
         "type": "sine"
@@ -108,8 +148,8 @@
         "sustain": 0,
         "release": 0.2
     }
-    });
-    synthWrong.set({
+    }
+    synthWrongDict = {
     "harmonicity":8,
     "modulationIndex": 2,
     "oscillator" : {
@@ -130,60 +170,46 @@
         "sustain": 0,
         "release": 0.2
     }
-    });
-
-    synthChord.set({
-    "harmonicity":8,
-    "modulationIndex": 2,
-    "oscillator" : {
-        "type": "sine"
-    },
-    "envelope": {
-        "attack": 0.001,
-        "decay": 2,
-        "sustain": 0.1,
-        "release": 2
-    },
-    "modulation" : {
-        "type" : "square"
-    },
-    "modulationEnvelope" : {
-        "attack": 0.002,
-        "decay": 0.2,
-        "sustain": 0,
-        "release": 0.2
     }
-    });
 
-    // synthChord.set({ envelope: {attack: 0.015 }});
-    // synthChord.set({ envelope: {attack: 0.015 }});
+    // for (i=0; i<synthRight.length;i++) { 
+    //     synthRight[i].set(synthRightDict); 
+    //     // synthWrong[i].set(synthWrongDict);    
+    // }
+    // const synthRight = new Tone.FMSynth(synthRightDict).toDestination(); 
+    // const synthWrong = new Tone.FMSynth(synthWrongDict).toDestination();
 
-    // synthChord.triggerAttackRelease(['E3', 'E4', 'G4', 'C5']);
+    const synthRight = new Tone.PolySynth(Tone.FMSynth).toDestination(); 
+    const synthWrong = new Tone.PolySynth(Tone.FMSynth).toDestination(); 
+    synthRight.set(synthRightDict); 
+    synthWrong.set(synthWrongDict); 
     
-    
-    
-    console.log(synthRight);
-// // set the attributes across all the voices using 'set'
-// synth.set({ detune: -1200 });
-// play a chord
-// synthChord.triggerAttackRelease(["C4", "E4", "A4"], 1);
+    console.log(synthRight[0]); 
 
     let answer_p = document.getElementById('answer_p');
     // Button event listeners
     let notes    = ['do', 're', 'mi', 'fa', 'so', 'la', 'ti', 'DO'];
-    let note2ind = {};
-    for (let i=0; i<notes.length;i++) {
-        note2ind[notes[i]] = i;
-    }
+
     let midi_num = [60, 62, 64, 65, 67, 69, 71, 72];
     let note_names = ['C4', 'D4', 'E4', 'F4', 'G4', 'A4', 'B4', 'C5'];
-    
+    let chords = ['I', 'ii', 'iii', 'IV', 'V', 'vi', 'vii°', 'I'];
+    let chord_names = [ ["C4 E4 G4"], 
+                        ['D4 F4 A4'], 
+                        ['E4 G4 B4'], 
+                        ['F4 A4 C5'], 
+                        ['G4 B4 D5'], 
+                        ['A4 C5 E5'], 
+                        ['B4 D5 F5'],
+                        ['C5 E5 G5'] ];
+
     let I;
 
     document.getElementById('start').onclick = start;
     document.getElementById('cadence').onclick = play_cadence;
 
 
+    document.getElementById('game_radio_note').onclick = init_game_type;
+    document.getElementById('game_radio_chord').onclick = init_game_type;
 
 
 
@@ -210,6 +236,28 @@
         return Math.round(Math.random() * max);
     }
 
+    function init_game_type() {
+        document.getElementById('answer_p').innerText =  this.value;
+        console.log("change game type");
+        for (let i=0; i<notes.length;i++) {
+            let m = midi_num[i];
+            let elem = document.getElementById(notes[i])
+            if (this.value=='note') {
+                elem.innerText = notes[i];
+                elem.dataset.note = note_names[i];
+                elem.style.fontVariantCaps = "";
+            }
+            else {
+                elem.innerText = chords[i];
+                elem.dataset.note = chord_names[i];
+                elem.style.fontVariantCaps = "normal";
+            }
+            
+            elem.onmousedown = answer;
+            document.addEventListener('keypress', logKey);
+    }
+    }
+
     function start(){
         
         // Tone.start();
@@ -220,6 +268,11 @@
         document.getElementById('start').onclick =  listen;
         
     }
+
+    // function triggerAttackRelease(note, length='4n', time=Tone.now()) {
+    //     synthRight[0].triggerAttackRelease(note, length, time);
+    // }
+
     // Setup state
     function new_game(new_I=true) {
         console.log("New game");
@@ -232,13 +285,13 @@
         if (new_I) {
             I = getRandomInt(notes.length-1); // random number
         }
-        synthRight.triggerAttackRelease(note_names[I], '4n');
+        // synthRight.triggerAttackRelease(note_names[I], '4n');
         // answer_p.innerHTML= "ヾ(´〇`)ﾉ♪♪♪";
         
         
         document.getElementById('start').innerHTML = "ヾ(´〇`)ﾉ♪♪♪";
         document.getElementById('start').className="new_game";
-        setTimeout(() => {  document.getElementById('start').innerHTML= "<span class=wondering_emoji></span><br>listen again?"; document.getElementById('start').className="wonder";}, 1000);
+        
         
 
         for (let i=0; i<notes.length;i++) {
@@ -248,46 +301,60 @@
             // modify classes based on the note to guess
             if (i==I){
                 elem.classList.add("right_answer");
+                synthRight.triggerAttackRelease(elem.dataset.note.split(' '), '4n');
             } else {
                 elem.classList.add("wrong_answer");
             }   
         }
+        setTimeout(() => {  document.getElementById('start').innerHTML= "<span class=wondering_emoji></span><br>listen again?"; document.getElementById('start').className="wonder";}, 1000);
     }
 
     function answer() {
         console.log("answer");
-        
+        let this_note = this.dataset.note.split(' ');
         this.classList.add("revealed");
         if (this.classList.contains("right_answer")) {
             console.log("Bravo");
             document.getElementById('start').innerHTML= "＼(＾▽＾)／";
             document.getElementById('start').className="right_answer";
             this.classList.add("revealed");
-            if (document.getElementById('play_end_sequence_checkbox').checked) {
+            if (document.getElementById('play_end_sequence_checkbox').checked) { 
                 wait_time = play_end_sequence ();
             } else {
                 if (document.getElementById('play_sound_checkbox').checked) {
-                    synthRight.triggerAttackRelease(this.dataset.note, '4n');
-                }
+                    synthRight.triggerAttackRelease(this_note, '4n');
+                    // triggerAttackRelease(this.dataset.index-I,'4n');
+                    // synthRight.triggerAttack(this.dataset.note);
+                    // synthRight.releaseAll('4n');
+                } 
                 wait_time = 1.0*1000.0;
-            }
+            } 
             setTimeout(() => {  new_game(); }, wait_time);
             // new_game();
         } else if (this.classList.contains("wrong_answer")) {
-            if (document.getElementById('play_sound_checkbox').checked) {
-                synthWrong.triggerAttackRelease(this.dataset.note, '4n');
+            if (document.getElementById('play_sound_checkbox').checked) { 
+                synthWrong.triggerAttackRelease(this_note, '4n');
+                console.log("wrong answer, note:", this_note)
+                // synthWrong.triggerAttack(this.dataset.note);
+                // synthWrong.releaseAll('4n');
             }
-            console.log("Booboo");
+            console.log("Booboo"); 
             document.getElementById('start').innerHTML= "(＞﹏＜)";
-            document.getElementById('start').className="wrong_answer";
-            document.getElementById('start').style.animation="none";
+            document.getElementById('start').className="wrong_answer"; 
+            document.getElementById('start').style.animation="none"; 
             document.getElementById('start').offsetHeight;
-            document.getElementById('start').style.animation="";
+            document.getElementById('start').style.animation=""; 
             // setTimeout(() => {  document.getElementById('start').className="wrong_answer"; }, 1);
-            
-            this.classList.add("revealed");
+             
+            this.classList.add("revealed"); 
         } else {
-            synthRight.triggerAttackRelease(this.dataset.note, '4n');
+            synthWrong.triggerAttackRelease(this_note, '4n');
+            // synthWrong.triggerAttackRelease(['C4', 'E4', 'G4'], '4n');
+            console.log("unset answer, note:", this.dataset.note[1])
+            let A = ['C4', 'E4', 'G4']
+            console.log(A[0])
+            console.log(typeof(this.dataset.note))
+            // console.log(typeof(['C4', 'E4', 'G4']));
             console.log("The class of this button is unknown, or unset.")
         }
     }
@@ -295,7 +362,6 @@
     function listen(){
         console.log(I);
         new_game(new_I=false);
-        // synthRight.triggerAttackRelease(note_names[I], '4n');
     }
 
     function play_end_sequence () {
@@ -320,6 +386,7 @@
         }
         
         let counter = 0
+        
         const seq = new Tone.Part(
             (time, note) => {
                 synthRight.triggerAttackRelease(note, 0.8*note_length, time);
@@ -352,7 +419,8 @@
         let counter  = 0
         const seq = new Tone.Part(
             (time, note) => {
-                synthChord.triggerAttackRelease(note, 0.8*note_length, time);
+                // synthRight.triggerAttackRelease(note, 0.8*note_length, time);
+                synthRight.triggerAttackRelease(note, 0.8*note_length, time);
                 console.log("event!!", counter, time, note);
                 counter++;
 
