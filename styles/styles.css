@@ -4,7 +4,7 @@
 
     --right-answer-bg-color:        rgb(110, 240, 110);
     --right-answer-bg-color-hover:  rgb(140, 255, 140); 
-    --right-answer-bg-color-flash:  rgb(220, 255, 220); 
+    --right-answer-bg-color-flash:  rgb(210, 255, 210); 
 
     --wrong-answer-bg-color:        rgb(230, 129, 129);
     --wrong-answer-bg-color-hover:  rgb(255, 159, 159);
@@ -12,7 +12,7 @@
     --wrong-answer-bg-color-flashB: rgb( 50,   0,   0);
 
     --sequence-bg-color:            rgb(110, 240, 200);
-    --sequence-bg-color-flash:      rgb(220, 240, 230);;
+    --sequence-bg-color-flash:      rgb(200, 240, 210);;
 
     --main-font-family: 'Montserrat', 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
     

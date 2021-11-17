@@ -23,6 +23,7 @@
     <br>
     <div id="start-div">
         <button id="start" class="start"><span class=greeting_emoji></span><br>start</button>
+        
     </div>
     <br>
     <div class='div-note'>
@@ -35,7 +36,13 @@
         <button id="ti" class="note" data-note="" data-I="6">Ti</button>
         <button id="DO" class="note" data-note="" data-I="7">Do</button>
     </div>
-    <!-- <div><p id="answer_p">Click start</p></div> -->
+
+    </br>
+    <div>
+        <button id="cadence" class="cadence">Play the cadence</button>
+        
+    </div>
+    <div><p id="answer_p">...</p></div>
 
     <br>
 
@@ -44,13 +51,14 @@
         <ul>
             
             
-            <li>add keyboard eventlisteners to play the game with the keyboard</li>
-            <li>add a slider for the waiting time before the next game</li>
-            <li> block button clicks while the sequence is playing </li>
-            <li> print "listen again" in start button on hover</li>
+            
+            
             <li> implement the playing of the cadence</li>
             <li> Add a button to play the cadence</li>
             <li> Add a slider to define how often to play the cadence</li>
+            <li>add a slider for the waiting time before the next game</li>
+            <li> block button clicks while the sequence is playing </li>
+            <li><strike>add keyboard eventlisteners to play the game with the keyboard</strike></li>
             <li> <strike>shake the emoji (or the div) when a wrong note is played</strike> </li>
             <li> <strike>change the color of the start button depending on emoji</strike></li>
             <li> <strike>flash the wrong note</strike> </li>
@@ -72,8 +80,93 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.32/Tone.js"></script>
 <script src="scripts/sound.js"></script>
 <script>
-    const synthRight = new Tone.Synth().toDestination();
-    const synthWrong = new Tone.Synth().toDestination();
+    const synthRight = new Tone.FMSynth().toDestination();
+    const synthWrong = new Tone.FMSynth().toDestination();
+
+
+
+    const synthChord = new Tone.PolySynth(Tone.FMSynth).toDestination();
+
+    synthRight.set({
+    "harmonicity":8,
+    "modulationIndex": 2,
+    "oscillator" : {
+        "type": "sine"
+    },
+    "envelope": {
+        "attack": 0.001,
+        "decay": 2,
+        "sustain": 0.1,
+        "release": 2
+    },
+    "modulation" : {
+        "type" : "square"
+    },
+    "modulationEnvelope" : {
+        "attack": 0.002,
+        "decay": 0.2,
+        "sustain": 0,
+        "release": 0.2
+    }
+    });
+    synthWrong.set({
+    "harmonicity":8,
+    "modulationIndex": 2,
+    "oscillator" : {
+        "type": "triangle"
+    },
+    "envelope": {
+        "attack": 0.015,
+        "decay": 2,
+        "sustain": 0.1,
+        "release": 2
+    },
+    "modulation" : {
+        "type" : "square"
+    },
+    "modulationEnvelope" : {
+        "attack": 0.02,
+        "decay": 0.2,
+        "sustain": 0,
+        "release": 0.2
+    }
+    });
+
+    synthChord.set({
+    "harmonicity":8,
+    "modulationIndex": 2,
+    "oscillator" : {
+        "type": "sine"
+    },
+    "envelope": {
+        "attack": 0.001,
+        "decay": 2,
+        "sustain": 0.1,
+        "release": 2
+    },
+    "modulation" : {
+        "type" : "square"
+    },
+    "modulationEnvelope" : {
+        "attack": 0.002,
+        "decay": 0.2,
+        "sustain": 0,
+        "release": 0.2
+    }
+    });
+
+    // synthChord.set({ envelope: {attack: 0.015 }});
+    // synthChord.set({ envelope: {attack: 0.015 }});
+
+    // synthChord.triggerAttackRelease(['E3', 'E4', 'G4', 'C5']);
+    
+    
+    
+    console.log(synthRight);
+// // set the attributes across all the voices using 'set'
+// synth.set({ detune: -1200 });
+// play a chord
+// synthChord.triggerAttackRelease(["C4", "E4", "A4"], 1);
 
     let answer_p = document.getElementById('answer_p');
     // Button event listeners
@@ -88,7 +181,9 @@
     let I;
 
     document.getElementById('start').onclick = start;
-    
+    document.getElementById('cadence').onclick = play_cadence;
+
+
 
 
 
@@ -97,19 +192,19 @@
             let elem = document.getElementById(notes[i])
             elem.dataset.note = note_names[i];
             elem.onmousedown = answer;
+            document.addEventListener('keypress', logKey);
     }
 
-    // function play_note() {
-    //     console.log("play_sound", play_sound)
-    //     if (play_sound) {
-    //         synthRight.triggerAttack(this.dataset.note);
-    //     }
-    // }
-    // function stop_note() {
-    //     if (play_sound) {
-    //         synthRight.triggerRelease();
-    //     }
-    // }
+    function logKey(e) {
+        let textContent = ` ${e.code}`;
+        
+        key = Number(`${e.key}`);
+        console.log(textContent, key);
+        document.getElementById(notes[key-1]).onmousedown();
+        
+        
+    }
+
 
     function getRandomInt(max) {
         return Math.round(Math.random() * max);
@@ -208,7 +303,7 @@
         let now = Tone.now()
         let note_seq = [];
         let indices = [];
-        note_length = 0.75;
+        let note_length = 0.75;
 
         let i_end, i_mod;
         if (I<4) {
@@ -245,6 +340,34 @@
         Tone.Transport.start();
         return Tone.Transport.toSeconds(wait_time+1.0)*1000
         
+    }
+
+    function play_cadence() {
+        // document.getElementById("answer_p").innerHTML = "Cadence";
+        document.getElementById("answer_p").innerText = "Cadence";
+        // synthRight.triggerAttackRelease(, 0.8*note_length, time);
+        let note_length = 0.75;
+        console.log("cadence");
+
+        let counter  = 0
+        const seq = new Tone.Part(
+            (time, note) => {
+                synthChord.triggerAttackRelease(note, 0.8*note_length, time);
+                console.log("event!!", counter, time, note);
+                counter++;
+
+                            }, 
+            [[note_length*0, ['E3', 'E4', 'G4', 'C5']], 
+             [note_length*1, ['F3', 'D4', 'A4', 'C5']],
+            //  [note_length*2, ['G3', 'E4', 'G4', 'C5']],
+             [note_length*2, ['G3', 'D4', 'G4', 'B4']],
+             [note_length*3, ['C3', 'E4', 'G4', 'C5']],]
+            );
+        seq.start();
+        console.log(Tone.Transport.state);
+
+
+        Tone.Transport.start();
     }
 
 </script>
