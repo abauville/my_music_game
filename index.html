@@ -62,9 +62,9 @@
         <h3>To do</h3>
         <ul>
             <li>Implement inversion and voice leading for chords (high proba for best voice leading, and lower proba for others (if always best, it will just be stuck in whatever inversion it started))</li>
+            <li>Get a dictionary of guitar chords (e.g. diatonic in E major)</li>
             <li>Implement markov chain to get more natural chord progressions</li>
 
-            
             
             
             <li>play bass note in different instrument (+add option) for chord game</li>
@@ -86,12 +86,9 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.32/Tone.js"></script>
 <script src="scripts/sound.js"></script>
 <script src="scripts/synths.js"></script>
+<script src="scripts/utils.js"></script>
 <script>
-    // Utils
-    // =====================================
-    function getRandomInt(max) {
-        return Math.round(Math.random() * max);
-    }
+    
 
 
     // Useful variables
@@ -101,15 +98,83 @@
     let midi_num = [60, 62, 64, 65, 67, 69, 71, 72];
     let note_names = ['C4', 'D4', 'E4', 'F4', 'G4', 'A4', 'B4', 'C5'];
     let chords = ['I', 'ii', 'iii', 'IV', 'V', 'vi', 'vii°', 'I'];
-    let chord_names = [ ["C4 E4 G4"], 
-                        ['D4 F4 A4'], 
-                        ['E4 G4 B4'], 
-                        ['F4 A4 C5'], 
-                        ['G4 B4 D5'], 
-                        ['A4 C5 E5'], 
-                        ['B4 D5 F5'],
-                        ['C5 E5 G5'] ];
-    let I = getRandomInt(notes.length-1); // random number
+    let chord_names = [ 'C4 E4 G4', 
+                        'D4 F4 A4', 
+                        'E4 G4 B4', 
+                        'F4 A4 C5', 
+                        'G4 B4 D5', 
+                        'A4 C5 E5', 
+                        'B4 D5 F5',
+                        'C5 E5 G5' ];
+    let I_noteToGuess = getRandomInt(notes.length-1); // random number
+
+    let previous_chord = 'C4 E4 G4';
+    let current_chord = 'G4 B4 D5';
+
+    let prev_chord_array = previous_chord.split(' ');
+    let curr_chord_array = current_chord.split(' ');
+    let prev = [0, 0, 0];
+    let curr = [0,0,0];
+    for (i=0; i<3; i++) {
+        prev[i] = noteName2MidiNum[prev_chord_array[i]];// % 12; // ideally should use distance in terms of chord degree rather than chromatic distance
+        curr[i] = noteName2MidiNum[curr_chord_array[i]];// % 12;
+    }
+
+
+    let score;
+    let min_score = 1e100;
+    let I_best;
+    // for (i_inv=0; i_inv<3; i_inv++){
+
+    
+        // score = arrSum(prev.map((p, ind) => {
+        //     let dist = curr[(ind+i_inv)%3]-p;
+        //     return Math.min(Math.abs(dist), Math.abs(dist-12), Math.abs(dist+12));    
+        // }));
+
+        let scores = [0,0,0]
+        curr_inv0 = [curr[0], curr[1], curr[2]];
+        curr_inv1 = [curr[1], curr[2], curr[0]+12];
+        curr_inv2 = [curr[2], curr[0]+12, curr[1]+12];
+
+        dist_upper_inv0 = (curr_inv0[2]-prev[2])%12
+        dist_upper_inv1 = (curr_inv1[2]-prev[2])%12
+        dist_upper_inv2 = (curr_inv2[2]-prev[2])%12
+
+        curr_inv0 = curr_inv0.map(x => x-curr_inv0[2]+dist_upper_inv0+prev[2]);
+        curr_inv1 = curr_inv1.map(x => x-curr_inv1[2]+dist_upper_inv1+prev[2]);
+        curr_inv2 = curr_inv2.map(x => x-curr_inv2[2]+dist_upper_inv2+prev[2]);
+
+        scores[0] = arrSum(prev.map((p, ind) => {
+            let dist = curr_inv0[ind]-p;
+            return Math.min(Math.abs(dist), Math.abs(dist-12), Math.abs(dist+12));    
+        }));
+        scores[1] = arrSum(prev.map((p, ind) => {
+            let dist = curr_inv1[ind]-p;
+            return Math.min(Math.abs(dist), Math.abs(dist-12), Math.abs(dist+12));    
+        }));
+        scores[2] = arrSum(prev.map((p, ind) => {
+            let dist = curr_inv2[ind]-p;
+            return Math.min(Math.abs(dist), Math.abs(dist-12), Math.abs(dist+12));    
+        }));
+
+
+        // if (score<min_score) {
+        //     min_score = score;
+        //     I_best = i_inv;
+        // }
+    // }
+    console.log(I_best)
+    console.log("scores", scores)
+    // curr = curr.map((x,i) => curr[(i+I_best)%3]);
+    console.log("prev", prev);
+    console.log("curr", curr);
+    console.log(curr_inv0);
+    console.log(curr_inv1);
+    console.log(curr_inv2);
+    
+    let I = argMin(curr.map(x => x - prev[prev.length-1]))
+    console.log("best top note: ", curr[I]);
 
 
     // Set up key and mouse event handlers
@@ -175,14 +240,14 @@
         document.getElementById('start').className="new_game";
 
         if (new_I) {
-            I = getRandomInt(notes.length-1); // random number
+            I_noteToGuess = getRandomInt(notes.length-1); // random number
         }
                 
         // Assign right/wrong_answer class to buttons
         for (let i=0; i<notes.length;i++) {
             let elem = document.getElementById(notes[i]);
             elem.className = "note"; // clear the classList
-            if (i==I){
+            if (i==I_noteToGuess){
                 elem.classList.add("right_answer");
                 synthRight.triggerAttackRelease(elem.dataset.note.split(' '), '4n');
             } else {
@@ -242,13 +307,13 @@
         let note_length = 0.75;
 
         let i_end, i_mod;
-        if (I<4) {
+        if (I_noteToGuess<4) {
             i_end = -1;  i_mod = -1;
         } else {
             i_end =8;  i_mod = 1;   
         }
 
-        for (let i=I; i!==i_end; i+=i_mod) {
+        for (let i=I_noteToGuess; i!==i_end; i+=i_mod) {
             console.log(i);
             indices.push(i);
             note_seq.push([wait_time, note_names[i]]);
@@ -280,8 +345,6 @@
         let note_length = 0.75;
         console.log("cadence");
 
-        // Tone.Transport.stop()
-        // Tone.Transport.start()
         const seq = new Tone.Part (
             (time, note) => {
                 synthRight.triggerAttackRelease(note, 0.8*note_length, time);                
@@ -290,9 +353,7 @@
              [note_length*1, ['F3', 'D4', 'A4', 'C5']],
              [note_length*2, ['G3', 'D4', 'G4', 'B4']],
              [note_length*3, ['C3', 'E4', 'G4', 'C5']]]
-        ).start();
-        // Tone.Transport.start()
-        
+        ).start();        
     }
 
 </script>
