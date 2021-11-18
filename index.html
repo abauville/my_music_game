@@ -15,19 +15,31 @@
             checked>
         <label for="play_sound">Play sound on button click</label>
         <br>
+
         <input type="checkbox" id="play_end_sequence_checkbox" name="play_end_sequence"
             checked>
         <label for="play_end_sequence">Play the sequence to DO</label>
-        
-            
+        <br>
+
+        <input type="checkbox" id="use_chord_inversion_checkbox" name="use_chord_inversion"
+            checked>
+        <label for="use_chord_inversion">Use chord inversions</label>
+        <br>
+
+        <input type="checkbox" id="play_bass_checkbox" name="play_bass"
+            checked>
+        <label for="play_bass">Play bass root note</label>
+        <br>
+
         <form id="game_form" style="text-align: left;"></form>
                 Game type:
-            <input type="radio" id="game_radio_note" name="game_radio" value="note"
-                checked>
+            <input type="radio" id="game_radio_note" name="game_radio" value="note">
             <label for="game_radio_note">Note</label>
-            <input type="radio" id="game_radio_chord" name="game_radio" value="chord">
+            <input type="radio" id="game_radio_chord" name="game_radio" value="chord" checked>
             <label for="game_radio_chord">Chord</label>
         </form>
+
+
         
         
 
@@ -39,14 +51,14 @@
     </div>
     <br>
     <div class='div-note'>
-        <button id="do" class="note" data-note="" data-I="0">Do</button>
-        <button id="re" class="note" data-note="" data-I="1">Re</button>
-        <button id="mi" class="note" data-note="" data-I="2">Mi</button>
-        <button id="fa" class="note" data-note="" data-I="3">Fa</button>
-        <button id="so" class="note" data-note="" data-I="4">So</button>
-        <button id="la" class="note" data-note="" data-I="5">La</button>
-        <button id="ti" class="note" data-note="" data-I="6">Ti</button>
-        <button id="DO" class="note" data-note="" data-I="7">Do</button>
+        <button id="do" class="note" data-note="" data-rootnote="" data-I="0">Do</button>
+        <button id="re" class="note" data-note="" data-rootnote="" data-I="1">Re</button>
+        <button id="mi" class="note" data-note="" data-rootnote="" data-I="2">Mi</button>
+        <button id="fa" class="note" data-note="" data-rootnote="" data-I="3">Fa</button>
+        <button id="so" class="note" data-note="" data-rootnote="" data-I="4">So</button>
+        <button id="la" class="note" data-note="" data-rootnote="" data-I="5">La</button>
+        <button id="ti" class="note" data-note="" data-rootnote="" data-I="6">Ti</button>
+        <button id="DO" class="note" data-note="" data-rootnote="" data-I="7">Do</button>
     </div>
 
     </br>
@@ -61,7 +73,14 @@
     <div style="text-align: left;">
         <h3>To do</h3>
         <ul>
-            <li>Implement inversion and voice leading for chords (high proba for best voice leading, and lower proba for others (if always best, it will just be stuck in whatever inversion it started))</li>
+            <li>Get the probability table for chord progressions</li>
+            <li>Implement limit selection of notes or chords -> requires weighted sampling function</li>
+            <li>Play bass note</li>
+            <li>Option button to play the bass note</li>
+            <li>Grey out options related to chords when gametype==note, and opposite</li>
+
+            <li>Add proba to inversion</li>
+            <li>modify scores to avoid parallel fifths and octaves</li>
             <li>Get a dictionary of guitar chords (e.g. diatonic in E major)</li>
             <li>Implement markov chain to get more natural chord progressions</li>
 
@@ -94,11 +113,13 @@
     // Useful variables
     // =====================================
     let answer_p = document.getElementById('answer_p');
+    
     let notes    = ['do', 're', 'mi', 'fa', 'so', 'la', 'ti', 'DO'];
     let midi_num = [60, 62, 64, 65, 67, 69, 71, 72];
     let note_names = ['C4', 'D4', 'E4', 'F4', 'G4', 'A4', 'B4', 'C5'];
+    let rootnote_names = ['C3', 'D3', 'E3', 'F2', 'G2', 'A2', 'B2', 'C3'];
     let chords = ['I', 'ii', 'iii', 'IV', 'V', 'vi', 'vii°', 'I'];
-    let chord_names = [ 'C4 E4 G4', 
+    let chord_names_root_position = [ 'C4 E4 G4', 
                         'D4 F4 A4', 
                         'E4 G4 B4', 
                         'F4 A4 C5', 
@@ -106,87 +127,37 @@
                         'A4 C5 E5', 
                         'B4 D5 F5',
                         'C5 E5 G5' ];
+    let chord_names = [...chord_names_root_position];
     let I_noteToGuess = getRandomInt(notes.length-1); // random number
 
     let previous_chord = 'C4 E4 G4';
     let current_chord = 'G4 B4 D5';
 
-    let prev_chord_array = previous_chord.split(' ');
-    let curr_chord_array = current_chord.split(' ');
-    let prev = [0, 0, 0];
-    let curr = [0,0,0];
-    for (i=0; i<3; i++) {
-        prev[i] = noteName2MidiNum[prev_chord_array[i]];// % 12; // ideally should use distance in terms of chord degree rather than chromatic distance
-        curr[i] = noteName2MidiNum[curr_chord_array[i]];// % 12;
-    }
-
-
-    let score;
-    let min_score = 1e100;
-    let I_best;
-    // for (i_inv=0; i_inv<3; i_inv++){
-
     
-        // score = arrSum(prev.map((p, ind) => {
-        //     let dist = curr[(ind+i_inv)%3]-p;
-        //     return Math.min(Math.abs(dist), Math.abs(dist-12), Math.abs(dist+12));    
-        // }));
-
-        let scores = [0,0,0]
-        curr_inv0 = [curr[0], curr[1], curr[2]];
-        curr_inv1 = [curr[1], curr[2], curr[0]+12];
-        curr_inv2 = [curr[2], curr[0]+12, curr[1]+12];
-
-        dist_upper_inv0 = (curr_inv0[2]-prev[2])%12
-        dist_upper_inv1 = (curr_inv1[2]-prev[2])%12
-        dist_upper_inv2 = (curr_inv2[2]-prev[2])%12
-
-        curr_inv0 = curr_inv0.map(x => x-curr_inv0[2]+dist_upper_inv0+prev[2]);
-        curr_inv1 = curr_inv1.map(x => x-curr_inv1[2]+dist_upper_inv1+prev[2]);
-        curr_inv2 = curr_inv2.map(x => x-curr_inv2[2]+dist_upper_inv2+prev[2]);
-
-        scores[0] = arrSum(prev.map((p, ind) => {
-            let dist = curr_inv0[ind]-p;
-            return Math.min(Math.abs(dist), Math.abs(dist-12), Math.abs(dist+12));    
-        }));
-        scores[1] = arrSum(prev.map((p, ind) => {
-            let dist = curr_inv1[ind]-p;
-            return Math.min(Math.abs(dist), Math.abs(dist-12), Math.abs(dist+12));    
-        }));
-        scores[2] = arrSum(prev.map((p, ind) => {
-            let dist = curr_inv2[ind]-p;
-            return Math.min(Math.abs(dist), Math.abs(dist-12), Math.abs(dist+12));    
-        }));
-
-
-        // if (score<min_score) {
-        //     min_score = score;
-        //     I_best = i_inv;
-        // }
-    // }
-    console.log(I_best)
-    console.log("scores", scores)
-    // curr = curr.map((x,i) => curr[(i+I_best)%3]);
-    console.log("prev", prev);
-    console.log("curr", curr);
-    console.log(curr_inv0);
-    console.log(curr_inv1);
-    console.log(curr_inv2);
     
-    let I = argMin(curr.map(x => x - prev[prev.length-1]))
-    console.log("best top note: ", curr[I]);
+    
 
 
     // Set up key and mouse event handlers
     // =====================================
+    let game_type = '';
     document.getElementById('start').onclick = start;
     document.getElementById('cadence').onclick = play_cadence;
     document.getElementById('game_radio_note').onclick = init_game_type;
     document.getElementById('game_radio_chord').onclick = init_game_type;
+    if (document.getElementById('game_radio_note').checked) {
+        document.getElementById('game_radio_note').onclick();
+    } else {
+        document.getElementById('game_radio_chord').onclick();
+    }
+    document.getElementById('use_chord_inversion_checkbox').onchange = () => {chord_names = [...chord_names_root_position];
+    console.log(chord_names)};
+
     for (let i=0; i<notes.length;i++) {
             let m = midi_num[i];
             let elem = document.getElementById(notes[i])
             elem.dataset.note = note_names[i];
+            elem.dataset.rootnote = rootnote_names[i];
             elem.onmousedown = answer;
             document.addEventListener('keypress', logKey);
     }
@@ -210,16 +181,26 @@
                 elem.innerText = notes[i];
                 elem.dataset.note = note_names[i];
                 elem.style.fontVariantCaps = "";
+                game_type = 'note';
+                document.getElementById('play_end_sequence_checkbox').checked = true;
+                document.getElementById('play_bass_checkbox').checked = false;
+                document.getElementById('use_chord_inversion_checkbox').checked = false;
             }
             else {
                 elem.innerText = chords[i];
                 elem.dataset.note = chord_names[i];
                 elem.style.fontVariantCaps = "normal";
+                game_type = 'chord';
+                document.getElementById('play_end_sequence_checkbox').checked = false;
+                document.getElementById('use_chord_inversion_checkbox').checked = true;
+                document.getElementById('play_bass_checkbox').checked = true;
             }
             
             elem.onmousedown = answer;
-            document.addEventListener('keypress', logKey);
-    }
+            
+        }
+        document.addEventListener('keypress', logKey);
+        console.log("game type: ", game_type);
     }
 
     // Start
@@ -227,7 +208,7 @@
     function start(){
         Tone.Transport.start();
         new_game();
-        document.getElementById('start').onclick =  new_game.bind(null, false);;
+        document.getElementById('start').onclick =  new_game.bind(null, false);
     }
 
 
@@ -239,17 +220,32 @@
         document.getElementById('start').innerHTML = "ヾ(´〇`)ﾉ♪♪♪";
         document.getElementById('start').className="new_game";
 
+        if (game_type == 'chord') {
+            previous_chord = chord_names[I_noteToGuess];
+        }
         if (new_I) {
             I_noteToGuess = getRandomInt(notes.length-1); // random number
         }
+
+        if (game_type == 'chord' && document.getElementById('use_chord_inversion_checkbox').checked) {
+            current_chord = chord_names[I_noteToGuess];
+            chord_names[I_noteToGuess] = get_chord_inversion(previous_chord, current_chord);   
+            console.log("previous chord", previous_chord);
+            console.log("new chord", chord_names[I_noteToGuess]);         
+        }
+        
                 
         // Assign right/wrong_answer class to buttons
         for (let i=0; i<notes.length;i++) {
             let elem = document.getElementById(notes[i]);
             elem.className = "note"; // clear the classList
-            if (i==I_noteToGuess){
+            if (i==I_noteToGuess || i==I_noteToGuess+7){
                 elem.classList.add("right_answer");
+                elem.dataset.note = chord_names[I_noteToGuess];
                 synthRight.triggerAttackRelease(elem.dataset.note.split(' '), '4n');
+                if (document.getElementById('play_bass_checkbox').checked) {
+                    synthBass.triggerAttackRelease(elem.dataset.rootnote, '4n');
+                }
             } else {
                 elem.classList.add("wrong_answer");
             }   
@@ -262,6 +258,7 @@
     function answer() {
         console.log("answer");
         let this_note = this.dataset.note.split(' ');
+        let rootnote = this.dataset.rootnote;
         this.classList.add("revealed");
         if (this.classList.contains("right_answer")) {
             console.log("Bravo");
@@ -273,6 +270,10 @@
             } else {
                 if (document.getElementById('play_sound_checkbox').checked) {
                     synthRight.triggerAttackRelease(this_note, '4n');
+                    if (document.getElementById('play_bass_checkbox').checked) {
+                        synthBass.triggerAttackRelease(rootnote, '4n');
+                    }
+                    
                 } 
                 wait_time = 1.0*1000.0;
             } 
@@ -280,6 +281,9 @@
         } else if (this.classList.contains("wrong_answer")) {
             if (document.getElementById('play_sound_checkbox').checked) { 
                 synthWrong.triggerAttackRelease(this_note, '4n');
+                if (document.getElementById('play_bass_checkbox').checked) {
+                    synthBass.triggerAttackRelease(rootnote, '4n');
+                }
             }
             console.log("Booboo"); 
             document.getElementById('start').innerHTML= "(＞﹏＜)";
@@ -291,6 +295,9 @@
             this.classList.add("revealed"); 
         } else {
             synthWrong.triggerAttackRelease(this_note, '4n');
+            if (document.getElementById('play_bass_checkbox').checked) {
+                synthBass.triggerAttackRelease(rootnote, '4n');
+            }
             console.log("The class of this button is unknown, or unset.")
         }
     }

@@ -43,8 +43,34 @@
     }
     }
 
-    const synthBass  = new Tone.FMSynth().toDestination(); 
+    synthBassDict = {
+        "harmonicity": 2.0,
+        "oscillator": {
+            "type": "triangle"
+        },
+        "envelope": {
+            "attack": 0.003,
+            "decay": 0.01,
+            "sustain": 0.5,
+            "release": 0.4
+        },
+        "modulation" : {
+                "volume" : 18,
+            "type": "sine"
+        },
+        "modulationEnvelope" : {
+            "attack": 0.01,
+            "decay": 0.01,
+            "sustain": 0.5,
+            "release": 0.1
+        }
+    }
+        
+
+    const synthBass  = new Tone.AMSynth().toDestination(); 
     const synthRight = new Tone.PolySynth(Tone.FMSynth).toDestination(); 
     const synthWrong = new Tone.PolySynth(Tone.FMSynth).toDestination(); 
     synthRight.set(synthRightDict); 
     synthWrong.set(synthWrongDict); 
+    synthBass.set(synthBassDict); 
+    
