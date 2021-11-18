@@ -158,7 +158,21 @@ span.wondering_emoji::before {
     animation: flash_right_answer 1 0.5s, bounce infinite 1.0s;
 }
 
-
+/* Cadence button */
+/* ====================== */
+#cadence {
+    height: 40px;
+    width: 120px;
+    margin: 10px;
+    border-radius: 10px 10px 10px 10px;
+    text-align: center;
+    font-family: var(--main-font-family);
+    font-variant-caps: small-caps;
+    font-weight: 500;
+    line-height: 150%;
+    background-color: aquamarine;
+    border-color: aquamarine;
+}
 
 
 
