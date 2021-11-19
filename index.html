@@ -33,11 +33,11 @@
 
         <form id="game_form" style="text-align: left;"></form>
                 Game type:
-            <input type="radio" id="game_radio_note" name="game_radio" value="note">
+            <input type="radio" id="game_radio_note" name="game_radio" value="note" checked>
             <label for="game_radio_note">Note</label>
             <input type="radio" id="game_radio_chord" name="game_radio" value="chord">
             <label for="game_radio_chord">Chord</label>
-            <input type="radio" id="game_radio_chord_prog" name="game_radio" value="chord_progression" checked>
+            <input type="radio" id="game_radio_chord_prog" name="game_radio" value="chord_progression" >
             <label for="game_radio_chord_prog">Chord prog.</label>
         </form>
 
@@ -53,14 +53,14 @@
     </div>
     <br>
     <div class='div-note'>
-        <button id="do" class="note" data-note="" data-rootnote="" data-I="0">Do</button>
-        <button id="re" class="note" data-note="" data-rootnote="" data-I="1">Re</button>
-        <button id="mi" class="note" data-note="" data-rootnote="" data-I="2">Mi</button>
-        <button id="fa" class="note" data-note="" data-rootnote="" data-I="3">Fa</button>
-        <button id="so" class="note" data-note="" data-rootnote="" data-I="4">So</button>
-        <button id="la" class="note" data-note="" data-rootnote="" data-I="5">La</button>
-        <button id="ti" class="note" data-note="" data-rootnote="" data-I="6">Ti</button>
-        <button id="DO" class="note" data-note="" data-rootnote="" data-I="7">Do</button>
+        <button id="do" class="note" name="note" data-note="" data-rootnote="" data-I="0">Do</button>
+        <button id="re" class="note" name="note" data-note="" data-rootnote="" data-I="1">Re</button>
+        <button id="mi" class="note" name="note" data-note="" data-rootnote="" data-I="2">Mi</button>
+        <button id="fa" class="note" name="note" data-note="" data-rootnote="" data-I="3">Fa</button>
+        <button id="so" class="note" name="note" data-note="" data-rootnote="" data-I="4">So</button>
+        <button id="la" class="note" name="note" data-note="" data-rootnote="" data-I="5">La</button>
+        <button id="ti" class="note" name="note" data-note="" data-rootnote="" data-I="6">Ti</button>
+        <button id="DO" class="note" name="note" data-note="" data-rootnote="" data-I="7">Do</button>
     </div>
     <div>
         <input type="checkbox" id="do_checkbox" name="note-select" class="note-select" checked>
@@ -144,8 +144,6 @@
 
     let previous_chord = 'C4 E4 G4';
     let current_chord = 'G4 B4 D5';
-
-    
     
     console.log("cumsum check: ", probabilities, arrCumSum(probabilities));
 
@@ -195,14 +193,12 @@
     }
 
 
-
     
-
     
-
-
     // New game
     // =====================================
+    let num_events = 4; // Number of successive notes or chords in one game
+    let I_guesses = Array(num_events).fill(0);
     function new_game(new_I=true) {
         console.log("New game");
         console.log("---");
@@ -212,9 +208,13 @@
         if (game_type == 'chord') {
             previous_chord = chord_names[I_noteToGuess];
         }
+
         if (new_I) {
             console.log("probas: ", probabilities);
             I_noteToGuess = getRandomIntWithWeights(probabilities); // random number
+            // for (i=0; i<num_events; i++) {
+            //     I_guesses[i] = getRandomIntWithWeights(probabilities); // random number
+            // }
         }
 
         if (game_type == 'chord' && document.getElementById('use_chord_inversion_checkbox').checked) {
@@ -224,80 +224,45 @@
             console.log("new chord", chord_names[I_noteToGuess]);         
         }
         
-                
-        // Assign right/wrong_answer class to buttons
-        for (let i=0; i<notes.length;i++) {
-            let elem = document.getElementById(notes[i]);
-            elem.className = "note"; // clear the classList
-            if (i==I_noteToGuess || i==I_noteToGuess+7){
-                elem.classList.add("right_answer");
-                if (game_type == 'note') {
-                    elem.dataset.note = note_names[I_noteToGuess];
-                } else if (game_type == 'chord') {
-                    elem.dataset.note = chord_names[I_noteToGuess];
-                } else {
-                    console.log("Error: unknown game_type");
-                }
-                
-                
-                synthRight.triggerAttackRelease(elem.dataset.note.split(' '), '4n');
-                if (document.getElementById('play_bass_checkbox').checked) {
-                    synthBass.triggerAttackRelease(elem.dataset.rootnote, '4n');
-                }
-            } else {
-                elem.classList.add("wrong_answer");
-            }   
-        }
+        // play note
+        set_button_answer_class(I_noteToGuess);    
+        elem = document.getElementsByName("note")[I_noteToGuess];
+        play_note(elem, '4n', play_sound=true);
+        
         setTimeout(() => {  document.getElementById('start').innerHTML= "<span class=wondering_emoji></span><br>listen again?"; document.getElementById('start').className="wonder";}, 1000);
-    }
+    } 
 
     // Answer
     // =====================================
     function answer() {
         console.log("answer");
-        let this_note = this.dataset.note.split(' ');
-        let rootnote = this.dataset.rootnote;
-        this.classList.add("revealed");
+        
         if (this.classList.contains("right_answer")) {
-            console.log("Bravo");
             document.getElementById('start').innerHTML= "＼(＾▽＾)／";
             document.getElementById('start').className="right_answer";
-            this.classList.add("revealed");
+
             if (document.getElementById('play_end_sequence_checkbox').checked) { 
                 wait_time = play_end_sequence ();
             } else {
-                if (document.getElementById('play_sound_checkbox').checked) {
-                    synthRight.triggerAttackRelease(this_note, '4n');
-                    if (document.getElementById('play_bass_checkbox').checked) {
-                        synthBass.triggerAttackRelease(rootnote, '4n');
-                    }
-                    
-                } 
+                play_note(this, '4n');
                 wait_time = 1.0*1000.0;
             } 
             setTimeout(() => {  new_game(); }, wait_time);
         } else if (this.classList.contains("wrong_answer")) {
-            if (document.getElementById('play_sound_checkbox').checked) { 
-                synthWrong.triggerAttackRelease(this_note, '4n');
-                if (document.getElementById('play_bass_checkbox').checked) {
-                    synthBass.triggerAttackRelease(rootnote, '4n');
-                }
-            }
-            console.log("Booboo"); 
+            // Animation
             document.getElementById('start').innerHTML= "(＞﹏＜)";
             document.getElementById('start').className="wrong_answer"; 
             document.getElementById('start').style.animation="none"; // next 3 lines restart animatino
             document.getElementById('start').offsetHeight;
             document.getElementById('start').style.animation=""; 
-             
-            this.classList.add("revealed"); 
+
+            play_note(this, '4n');
+            
         } else {
-            synthWrong.triggerAttackRelease(this_note, '4n');
-            if (document.getElementById('play_bass_checkbox').checked) {
-                synthBass.triggerAttackRelease(rootnote, '4n');
-            }
+            play_note(this, '4n', play_sound=true);
             console.log("The class of this button is unknown, or unset.")
         }
+        this.classList.add("revealed"); 
     }
     
     

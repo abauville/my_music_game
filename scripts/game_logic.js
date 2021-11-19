@@ -66,6 +66,55 @@ function start(){
     document.getElementById('start').onclick =  new_game.bind(null, false);
 }
 
+// Set button answer class
+// =====================================
+function set_button_answer_class(I_right){
+    // Assign right/wrong_answer class to buttons
+    for (let i=0; i<notes.length;i++) {
+        let elem = document.getElementById(notes[i]);
+        elem.className = "note"; // clear the classList
+        if (i==I_right || i==I_right+7){
+            elem.classList.add("right_answer");
+            if (game_type == 'note') {
+                elem.dataset.note = note_names[I_right];
+            } else if (game_type == 'chord') {
+                elem.dataset.note = chord_names[I_right];
+            } else {
+                console.log("Error: unknown game_type");
+            }
+        } else {
+            elem.classList.add("wrong_answer");
+        }   
+    }
+}
+
+function play_note(elem, note_length='4n', play_sound=null) {
+    console.log("play_note: ", play_sound)
+    let this_note = elem.dataset.note.split(' ');
+    let rootnote = elem.dataset.rootnote;
+
+    if (elem.classList.contains("right_answer")) {
+        synth = synthRight;
+    } else {
+        synth = synthWrong;
+    }
+
+    if (play_sound == null) { // the default value allows the checkbox to be overriden (e.g. for the start button)
+        if (document.getElementById('play_sound_checkbox').checked) {
+            play_sound=true;
+        } else {
+            play_sound=false;
+        }
+    }
+
+    if (play_sound) {
+        synth.triggerAttackRelease(this_note, note_length);
+        if (document.getElementById('play_bass_checkbox').checked) {
+            synthBass.triggerAttackRelease(rootnote, note_length);
+        }
+    } 
+}
+
 // Sequence
 // =====================================
 function play_end_sequence () {
