@@ -47,7 +47,7 @@
   
     <br>
     <div id="start-div">
-        <button id="start" class="start"><span class=greeting_emoji></span><br>start</button>
+        <button id="start" class="start"></button>
     </div>
     <br>
     <div class='div-note'>
@@ -123,11 +123,13 @@
     // =====================================
     let answer_p = document.getElementById('answer_p');
     
-    let notes    = ['do', 're', 'mi', 'fa', 'so', 'la', 'ti', 'DO'];
+    let notes         = ['do', 're', 'mi', 'fa', 'so', 'la', 'ti', 'DO'];
+    let probabilities = [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0];
     let midi_num = [60, 62, 64, 65, 67, 69, 71, 72];
     let note_names = ['C4', 'D4', 'E4', 'F4', 'G4', 'A4', 'B4', 'C5'];
     let rootnote_names = ['C3', 'D3', 'E3', 'F2', 'G2', 'A2', 'B2', 'C3'];
     let chords = ['I', 'ii', 'iii', 'IV', 'V', 'vi', 'vii°', 'I'];
+    
     let chord_names_root_position = [ 'C4 E4 G4', 
                         'D4 F4 A4', 
                         'E4 G4 B4', 
@@ -137,20 +139,21 @@
                         'B4 D5 F5',
                         'C5 E5 G5' ];
     let chord_names = [...chord_names_root_position];
-    let I_noteToGuess = getRandomInt(notes.length-1); // random number
+    let I_noteToGuess = getRandomIntWithWeights(probabilities); // random number
 
     let previous_chord = 'C4 E4 G4';
     let current_chord = 'G4 B4 D5';
 
     
     
-    
+    console.log("cumsum check: ", probabilities, arrCumSum(probabilities));
+
 
 
     // Set up key and mouse event handlers
     // =====================================
     let game_type = '';
-    document.getElementById('start').onclick = start;
+    
     document.getElementById('cadence').onclick = play_cadence;
     document.getElementById('game_radio_note').onclick = init_game_type;
     document.getElementById('game_radio_chord').onclick = init_game_type;
@@ -172,9 +175,12 @@
                 console.log("activate/deactivate " + notes[i], document.getElementById(notes[i] + '_checkbox').checked);
                 if (document.getElementById(notes[i] + '_checkbox').checked) {
                     document.getElementById(notes[i]).disabled = false;
+                    probabilities[i] = 1.0;
                 } else {
                     document.getElementById(notes[i]).disabled = true;
+                    probabilities[i] = 0.0;
                 }
+                init_game_type()
             }
     }
 
@@ -215,6 +221,9 @@
             }
             
             elem.onmousedown = answer;
+            document.getElementById('start').innerHTML = "<span class=greeting_emoji></span><br>start";
+            document.getElementById('start').className="start";
+            document.getElementById('start').onclick = start;
             
         }
         document.addEventListener('keypress', logKey);
@@ -242,7 +251,8 @@
             previous_chord = chord_names[I_noteToGuess];
         }
         if (new_I) {
-            I_noteToGuess = getRandomInt(notes.length-1); // random number
+            console.log("probas: ", probabilities);
+            I_noteToGuess = getRandomIntWithWeights(probabilities); // random number
         }
 
         if (game_type == 'chord' && document.getElementById('use_chord_inversion_checkbox').checked) {
@@ -259,7 +269,15 @@
             elem.className = "note"; // clear the classList
             if (i==I_noteToGuess || i==I_noteToGuess+7){
                 elem.classList.add("right_answer");
-                elem.dataset.note = chord_names[I_noteToGuess];
+                if (game_type == 'note') {
+                    elem.dataset.note = note_names[I_noteToGuess];
+                } else if (game_type == 'chord') {
+                    elem.dataset.note = chord_names[I_noteToGuess];
+                } else {
+                    console.log("Error: unknown game_type");
+                }
+                
+                
                 synthRight.triggerAttackRelease(elem.dataset.note.split(' '), '4n');
                 if (document.getElementById('play_bass_checkbox').checked) {
                     synthBass.triggerAttackRelease(elem.dataset.rootnote, '4n');

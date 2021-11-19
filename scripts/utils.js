@@ -4,12 +4,34 @@ function getRandomInt(max) {
     return Math.round(Math.random() * max);
 }
 
+function getRandomIntWithWeights(weights) {
+    let sum = arrSum(weights);
+    let cumsum_weights = arrCumSum(probabilities);
+    let random_float = Math.random() * sum
+    // console.log("random dfloat", random_float);
+    for (let i=0; i<weights.length; i++) {
+        if (random_float<cumsum_weights[i]) {
+            return i;
+        }
+    }
+}
+
 const argFact = (compareFn) => (array) => array.map((el, idx) => [el, idx]).reduce(compareFn)[1]
 
 const argMax = argFact((min, el) => (el[0] > min[0] ? el : min))
 const argMin = argFact((max, el) => (el[0] < max[0] ? el : max))
 
 const arrSum = arr => arr.reduce((a,b) => a + b, 0)
+
+function arrCumSum (arr) {
+    let out = Array(arr.length).fill(0)
+    out[0] = arr[0];
+    for (let i=1; i<arr.length; i++) {
+        out[i] = out[i-1]+arr[i];
+        // console.log(out[i]);
+    }
+    return out
+}
 
 // Musical functions
 // =====================================
