@@ -6,7 +6,7 @@
     <meta charset="utf-8">
     <title>My music game</title>
     <link rel="stylesheet" href="styles/styles.css">
-</head>
+</head>  
 
 <body>
 
@@ -59,6 +59,16 @@
         <button id="la" class="note" data-note="" data-rootnote="" data-I="5">La</button>
         <button id="ti" class="note" data-note="" data-rootnote="" data-I="6">Ti</button>
         <button id="DO" class="note" data-note="" data-rootnote="" data-I="7">Do</button>
+    </div>
+    <div>
+        <input type="checkbox" id="do_checkbox" name="note-select" class="note-select" checked>
+        <input type="checkbox" id="re_checkbox" name="note-select" class="note-select" checked>
+        <input type="checkbox" id="mi_checkbox" name="note-select" class="note-select" checked>
+        <input type="checkbox" id="fa_checkbox" name="note-select" class="note-select" checked>
+        <input type="checkbox" id="so_checkbox" name="note-select" class="note-select" checked>
+        <input type="checkbox" id="la_checkbox" name="note-select" class="note-select" checked>
+        <input type="checkbox" id="ti_checkbox" name="note-select" class="note-select" checked>
+        <input type="checkbox" id="DO_checkbox" name="note-select" class="note-select" checked>
     </div>
 
     </br>
@@ -149,8 +159,7 @@
     } else {
         document.getElementById('game_radio_chord').onclick();
     }
-    document.getElementById('use_chord_inversion_checkbox').onchange = () => {chord_names = [...chord_names_root_position];
-    console.log(chord_names)};
+    document.getElementById('use_chord_inversion_checkbox').onchange = () => {chord_names = [...chord_names_root_position];};
 
     for (let i=0; i<notes.length;i++) {
             let m = midi_num[i];
@@ -159,6 +168,14 @@
             elem.dataset.rootnote = rootnote_names[i];
             elem.onmousedown = answer;
             document.addEventListener('keypress', logKey);
+            document.getElementById(notes[i] + '_checkbox').onchange = () => {
+                console.log("activate/deactivate " + notes[i], document.getElementById(notes[i] + '_checkbox').checked);
+                if (document.getElementById(notes[i] + '_checkbox').checked) {
+                    document.getElementById(notes[i]).disabled = false;
+                } else {
+                    document.getElementById(notes[i]).disabled = true;
+                }
+            }
     }
 
     function logKey(e) {
@@ -167,6 +184,8 @@
         console.log(textContent, key);
         document.getElementById(notes[key-1]).onmousedown();
     }
+
+
 
     // Game type
     // =====================================

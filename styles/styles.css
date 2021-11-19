@@ -1,6 +1,7 @@
 :root {
     --note-bg-color:                rgb(80, 215, 255);
     --note-bg-color-hover:          rgb(150, 230, 255);
+    --note-bg-disabled:             rgb(140, 175, 190);
 
     --right-answer-bg-color:        rgb(110, 240, 110);
     --right-answer-bg-color-hover:  rgb(140, 255, 140); 
@@ -48,6 +49,15 @@ button.note {
 button.note:hover, button.note:active{
     background-color: var(--note-bg-color-hover);
     border-color: var(--note-bg-color-hover);
+}
+
+button.note:disabled {
+    background-color: var(--note-bg-disabled);
+    border-color: var(--note-bg-disabled);
+}
+
+.note-select { /* selection checkboxes */
+    width: 33px;
 }
 
 /* Right answer button */
@@ -173,7 +183,6 @@ span.wondering_emoji::before {
     background-color: aquamarine;
     border-color: aquamarine;
 }
-
 
 
 @keyframes flash_right_answer { 
