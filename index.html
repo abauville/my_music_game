@@ -83,11 +83,8 @@
     <div style="text-align: left;">
         <h3>To do</h3>
         <ul>
+            <li> add a button to show/hide button selection </li>
             <li>Get the probability table for chord progressions</li>
-            <li>Implement limit selection of notes or chords -> requires weighted sampling function</li>
-            <li>Play bass note</li>
-            <li>Option button to play the bass note</li>
-            <li>Grey out options related to chords when gametype==note, and opposite</li>
 
             <li>Add proba to inversion</li>
             <li>modify scores to avoid parallel fifths and octaves</li>
@@ -207,8 +204,11 @@
                 elem.style.fontVariantCaps = "";
                 game_type = 'note';
                 document.getElementById('play_end_sequence_checkbox').checked = true;
+                document.getElementById('play_end_sequence_checkbox').disabled = false;
                 document.getElementById('play_bass_checkbox').checked = false;
+                document.getElementById('play_bass_checkbox').disabled = true;
                 document.getElementById('use_chord_inversion_checkbox').checked = false;
+                document.getElementById('use_chord_inversion_checkbox').disabled = true;
             }
             else {
                 elem.innerText = chords[i];
@@ -216,8 +216,12 @@
                 elem.style.fontVariantCaps = "normal";
                 game_type = 'chord';
                 document.getElementById('play_end_sequence_checkbox').checked = false;
+                document.getElementById('play_end_sequence_checkbox').disabled = true;
+                
                 document.getElementById('use_chord_inversion_checkbox').checked = true;
+                document.getElementById('use_chord_inversion_checkbox').disabled = false;
                 document.getElementById('play_bass_checkbox').checked = true;
+                document.getElementById('play_bass_checkbox').disabled = false;
             }
             
             elem.onmousedown = answer;
