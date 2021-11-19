@@ -35,8 +35,10 @@
                 Game type:
             <input type="radio" id="game_radio_note" name="game_radio" value="note">
             <label for="game_radio_note">Note</label>
-            <input type="radio" id="game_radio_chord" name="game_radio" value="chord" checked>
+            <input type="radio" id="game_radio_chord" name="game_radio" value="chord">
             <label for="game_radio_chord">Chord</label>
+            <input type="radio" id="game_radio_chord_prog" name="game_radio" value="chord_progression" checked>
+            <label for="game_radio_chord_prog">Chord prog.</label>
         </form>
 
 
@@ -83,17 +85,18 @@
     <div style="text-align: left;">
         <h3>To do</h3>
         <ul>
+            <li> Implement the chord prog game</li>
+            <li>Use the chord progression table</li>
+
             <li> add a button to show/hide button selection </li>
             <li>Get the probability table for chord progressions</li>
 
+
             <li>Add proba to inversion</li>
             <li>modify scores to avoid parallel fifths and octaves</li>
-            <li>Get a dictionary of guitar chords (e.g. diatonic in E major)</li>
+            <!-- <li>Get a dictionary of guitar chords (e.g. diatonic in E major)</li> -->
             <li>Implement markov chain to get more natural chord progressions</li>
 
-            
-            
-            <li>play bass note in different instrument (+add option) for chord game</li>
             <li>slider for volume of bass note</li>
 
 
@@ -112,6 +115,7 @@
 <script src="scripts/sound.js"></script>
 <script src="scripts/synths.js"></script>
 <script src="scripts/utils.js"></script>
+<script src="scripts/game_logic.js"></script>
 <script>
     
 
@@ -152,13 +156,15 @@
     let game_type = '';
     
     document.getElementById('cadence').onclick = play_cadence;
-    document.getElementById('game_radio_note').onclick = init_game_type;
-    document.getElementById('game_radio_chord').onclick = init_game_type;
-    if (document.getElementById('game_radio_note').checked) {
-        document.getElementById('game_radio_note').onclick();
-    } else {
-        document.getElementById('game_radio_chord').onclick();
+    
+    // Init and apply switch game type
+    let elem = document.getElementsByName('game_radio');
+    for(i = 0; i < elem.length; i++) {
+        elem[i].onclick = switch_game_type;
+        elem[i].onclick();
     }
+
+    console.log("There, ", game_type);
     document.getElementById('use_chord_inversion_checkbox').onchange = () => {chord_names = [...chord_names_root_position];};
 
     for (let i=0; i<notes.length;i++) {
@@ -190,57 +196,9 @@
 
 
 
-    // Game type
-    // =====================================
-    function init_game_type() {
-        answer_p.innerText =  this.value;
-        console.log("change game type");
-        for (let i=0; i<notes.length;i++) {
-            let m = midi_num[i];
-            let elem = document.getElementById(notes[i])
-            if (this.value=='note') {
-                elem.innerText = notes[i];
-                elem.dataset.note = note_names[i];
-                elem.style.fontVariantCaps = "";
-                game_type = 'note';
-                document.getElementById('play_end_sequence_checkbox').checked = true;
-                document.getElementById('play_end_sequence_checkbox').disabled = false;
-                document.getElementById('play_bass_checkbox').checked = false;
-                document.getElementById('play_bass_checkbox').disabled = true;
-                document.getElementById('use_chord_inversion_checkbox').checked = false;
-                document.getElementById('use_chord_inversion_checkbox').disabled = true;
-            }
-            else {
-                elem.innerText = chords[i];
-                elem.dataset.note = chord_names[i];
-                elem.style.fontVariantCaps = "normal";
-                game_type = 'chord';
-                document.getElementById('play_end_sequence_checkbox').checked = false;
-                document.getElementById('play_end_sequence_checkbox').disabled = true;
-                
-                document.getElementById('use_chord_inversion_checkbox').checked = true;
-                document.getElementById('use_chord_inversion_checkbox').disabled = false;
-                document.getElementById('play_bass_checkbox').checked = true;
-                document.getElementById('play_bass_checkbox').disabled = false;
-            }
-            
-            elem.onmousedown = answer;
-            document.getElementById('start').innerHTML = "<span class=greeting_emoji></span><br>start";
-            document.getElementById('start').className="start";
-            document.getElementById('start').onclick = start;
-            
-        }
-        document.addEventListener('keypress', logKey);
-        console.log("game type: ", game_type);
-    }
+    
 
-    // Start
-    // =====================================
-    function start(){
-        Tone.Transport.start();
-        new_game();
-        document.getElementById('start').onclick =  new_game.bind(null, false);
-    }
+    
 
 
     // New game
@@ -343,64 +301,6 @@
     }
     
     
-    // Sequence
-    // =====================================
-    function play_end_sequence () {
-        console.log("end sequence")
-        let wait_time=0;
-        let now = Tone.now()
-        let note_seq = [];
-        let indices = [];
-        let note_length = 0.75;
-
-        let i_end, i_mod;
-        if (I_noteToGuess<4) {
-            i_end = -1;  i_mod = -1;
-        } else {
-            i_end =8;  i_mod = 1;   
-        }
-
-        for (let i=I_noteToGuess; i!==i_end; i+=i_mod) {
-            console.log(i);
-            indices.push(i);
-            note_seq.push([wait_time, note_names[i]]);
-            wait_time+=note_length;
-        }
-        
-        let counter = 0
-        const seq = new Tone.Part(
-            (time, note) => {
-                synthRight.triggerAttackRelease(note, 0.8*note_length, time);
-                console.log("event!!", counter, time, note);
-                let cl = document.getElementById(notes[indices[counter]]).classList;
-                if (cl.contains("wrong_answer")) {
-                    document.getElementById(notes[indices[counter]]).className = "note sequence";
-                }
-                counter++;
-            }, 
-            note_seq,
-        ).start();
-        console.log(Tone.Transport.state);
-        
-        return Tone.Transport.toSeconds(wait_time+1.0)*1000
-    }
-
-    // Cadence
-    // =====================================
-    function play_cadence() {
-        answer_p.innerText = "Cadence";
-        let note_length = 0.75;
-        console.log("cadence");
-
-        const seq = new Tone.Part (
-            (time, note) => {
-                synthRight.triggerAttackRelease(note, 0.8*note_length, time);                
-            }, 
-            [[note_length*0, ['E3', 'E4', 'G4', 'C5']], 
-             [note_length*1, ['F3', 'D4', 'A4', 'C5']],
-             [note_length*2, ['G3', 'D4', 'G4', 'B4']],
-             [note_length*3, ['C3', 'E4', 'G4', 'C5']]]
-        ).start();        
-    }
+    
 
 </script>
