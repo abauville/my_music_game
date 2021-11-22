@@ -125,6 +125,7 @@
 <script src="scripts/synths.js"></script>
 <script src="scripts/play.js"></script>
 <script src="scripts/game_logic.js"></script>
+<script src="scripts/melody.js"></script>
 <script>
         
 
@@ -226,9 +227,7 @@
 
         if (new_I) {
             console.log("probas: ", probabilities);
-            for (i=0; i<num_events; i++) {
-                I_guesses[i] = getRandomIntWithWeights(probabilities); // random number
-            }
+            I_guesses = get_melody();
             subI_guess = 0;
             I_noteToGuess = I_guesses[0];
             console.log("I_guesses: ", I_guesses);
