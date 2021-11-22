@@ -37,8 +37,6 @@
             <label for="game_radio_note">Note</label>
             <input type="radio" class="radio" id="game_radio_chord" name="game_radio" value="chord">
             <label for="game_radio_chord">Chord</label>
-            <input type="radio" class="radio" id="game_radio_chord_prog" name="game_radio" value="chord_progression" >
-            <label for="game_radio_chord_prog">Chord prog.</label>
         </form>
 
         <div class="slidecontainer" style="text-align: left;">
@@ -92,12 +90,9 @@
     <div style="text-align: left;">
         <h3>To do</h3>
         <ul>
-            <li> Implement several notes to guess</li>
-            <li> Start plays several notes </li>
-            <li>Answer checks one note at a time and update call set_answer_class. Only at the end of the sequence, it will call new_game</li>
-            <li>n (number of notes to guess) little circles that fill up blue or red once a note is guessed correctly or incorrectly, resp.</li>
             <li> If num_events>1 uncheck sequence back to do</li>
             <li> the short wait when guessing several notes is not the most elegant</li>
+            <li> disable high DO for chord games</li>
             <!-- <li> Implement the chord prog game</li> -->
 
             <!-- <li>Use the chord progression table</li> -->
@@ -212,21 +207,6 @@
     document.getElementById("num_events_slider").oninput = init_num_events;
     document.getElementById("num_events_slider").oninput();
 
-    function init_num_events () {
-        console.log("init num_events");
-        num_events = this.value;
-        I_guesses = Array(num_events).fill(0);
-        document.getElementById("num_events_label").innerText = num_events;
-        
-        if (num_events>1) {
-            document.getElementById('play_end_sequence_checkbox').checked = false;
-            document.getElementById('play_end_sequence_checkbox').disabled = true;
-        }
-        
-        create_multiguess_buttons();
-        init_game_type();
-    }
-
     
     
     // New game
@@ -271,23 +251,7 @@
 
  
 
-    function create_multiguess_buttons () {
-        document.getElementById("multi_guess_tracker_div").innerHTML = ""; // clean up
-        for (i=0; i<num_events; i++) {
-            let btn = document.createElement("button");    
-            btn.id = "multi_guess_tracker_" + i;
-            btn.disabled = "disabled";
-            document.getElementById("multi_guess_tracker_div").appendChild(btn);
-        }   
-        init_multiguess_buttons ()
-    }
-
-    function init_multiguess_buttons () {
-        for (i=0; i<num_events; i++) {
-            let btn = document.getElementById("multi_guess_tracker_" + i);
-            btn.className = "tracker";
-        }
-    }
+    
 
     // Start sequence
     // =====================================

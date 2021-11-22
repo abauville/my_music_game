@@ -10,13 +10,19 @@ function switch_game_type () {
 
 function init_game_type() {
     if (game_type=='note') {
-        document.getElementById('play_end_sequence_checkbox').checked = true;
-        document.getElementById('play_end_sequence_checkbox').disabled = false;
+        if (num_events==1) {
+            document.getElementById('play_end_sequence_checkbox').checked = true;
+            document.getElementById('play_end_sequence_checkbox').disabled = false;
+        } else {
+            document.getElementById('play_end_sequence_checkbox').checked = false;
+            document.getElementById('play_end_sequence_checkbox').disabled = true;
+        }
+        
         document.getElementById('play_bass_checkbox').checked = false;
         document.getElementById('play_bass_checkbox').disabled = true;
         document.getElementById('use_chord_inversion_checkbox').checked = false;
         document.getElementById('use_chord_inversion_checkbox').disabled = true;
-    } else if (game_type=='chord' || game_type=='chord_progression') {
+    } else if (game_type=='chord') {
         document.getElementById('play_end_sequence_checkbox').checked = false;
         document.getElementById('play_end_sequence_checkbox').disabled = true;
         document.getElementById('use_chord_inversion_checkbox').checked = true;
@@ -37,10 +43,6 @@ function init_game_type() {
             elem.style.fontVariantCaps = "";
         }
         else if (game_type=='chord') {
-            elem.innerText = chords[i];
-            elem.dataset.note = chord_names[i];
-            elem.style.fontVariantCaps = "normal";
-        } else if (game_type=='chord_progression') {
             elem.innerText = chords[i];
             elem.dataset.note = chord_names[i];
             elem.style.fontVariantCaps = "normal";
@@ -88,4 +90,34 @@ function set_button_answer_class(I_right){
     }
 }
 
+
+// Multi guesses logic
+// =====================================
+function init_num_events () {
+    console.log("init num_events");
+    num_events = Number(this.value);
+    I_guesses = Array(num_events).fill(0);
+    document.getElementById("num_events_label").innerText = num_events;
+    console.log("num_events:", num_events);
+    create_multiguess_buttons();
+    init_game_type();    
+}
+
+function create_multiguess_buttons () {
+    document.getElementById("multi_guess_tracker_div").innerHTML = ""; // clean up
+    for (i=0; i<num_events; i++) {
+        let btn = document.createElement("button");    
+        btn.id = "multi_guess_tracker_" + i;
+        btn.disabled = "disabled";
+        document.getElementById("multi_guess_tracker_div").appendChild(btn);
+    }   
+    init_multiguess_buttons ()
+}
+
+function init_multiguess_buttons () {
+    for (i=0; i<num_events; i++) {
+        let btn = document.getElementById("multi_guess_tracker_" + i);
+        btn.className = "tracker";
+    }
+}
 

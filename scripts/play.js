@@ -41,7 +41,6 @@ function play_note(elem, note_length, opt={}) {
     // console.log("play_sound:", play_sound);
 
 
-
     if (play_sound) {
         let this_note = elem.dataset.note.split(' ');
         let root_note = elem.dataset.rootnote;
