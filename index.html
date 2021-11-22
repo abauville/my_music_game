@@ -33,13 +33,19 @@
 
         <form id="game_form" style="text-align: left;"></form>
                 Game type:
-            <input type="radio" id="game_radio_note" name="game_radio" value="note" checked>
+            <input type="radio" class="radio" id="game_radio_note" name="game_radio" value="note" checked>
             <label for="game_radio_note">Note</label>
-            <input type="radio" id="game_radio_chord" name="game_radio" value="chord">
+            <input type="radio" class="radio" id="game_radio_chord" name="game_radio" value="chord">
             <label for="game_radio_chord">Chord</label>
-            <input type="radio" id="game_radio_chord_prog" name="game_radio" value="chord_progression" >
+            <input type="radio" class="radio" id="game_radio_chord_prog" name="game_radio" value="chord_progression" >
             <label for="game_radio_chord_prog">Chord prog.</label>
         </form>
+
+        <div class="slidecontainer" style="text-align: left;">
+            <label for="num_events_slider">Number of notes to guess</label>
+            <input type="range" min="1" max="10" value="1" class="slider" id="num_events_slider">
+            <label id="num_events_label" for="num_events_slider">1</label>
+        </div>
 
 
         
@@ -52,7 +58,7 @@
         <button id="start" class="start"></button>
     </div>
     <div id="multi_guess_tracker_div"></div>
-    <br>
+    <!-- <br> -->
     <div class='div-note'>
         <button id="do" class="note" name="note" data-note="" data-rootnote="" data-I="0">Do</button>
         <button id="re" class="note" name="note" data-note="" data-rootnote="" data-I="1">Re</button>
@@ -114,27 +120,7 @@
         </ul>        
     </div>
 
-    <style>
-        .tracker {
-            width: 15px;
-            height: 15px;
-            padding: 0px;
-            border-width: 1px;
-            border-radius: 50%;
-            border-style: inset;
-            margin:2px;
 
-        }
-        .tracker.right {
-            background-color: var(--right-answer-bg-color);
-            /* border-color: grey; */
-            border-color: var(--right-answer-bg-color);
-        }
-        .tracker.wrong {
-            background-color: var(--wrong-answer-bg-color);
-            border-color: var(--wrong-answer-bg-color);
-        }
-    </style>
     
 </body>
 
@@ -174,7 +160,9 @@
     let previous_chord = 'C4 E4 G4';
     let current_chord = 'G4 B4 D5';
     
-    console.log("cumsum check: ", probabilities, arrCumSum(probabilities));
+    let num_events; // Number of successive notes or chords in one game
+    let I_guesses;
+    let subI_guess = 0;
 
 
 
@@ -221,19 +209,31 @@
         document.getElementById(notes[key-1]).onmousedown();
     }
 
+    document.getElementById("num_events_slider").oninput = init_num_events;
+    document.getElementById("num_events_slider").oninput();
+
+    function init_num_events () {
+        console.log("init num_events");
+        num_events = this.value;
+        I_guesses = Array(num_events).fill(0);
+        document.getElementById("num_events_label").innerText = num_events;
+        
+        if (num_events>1) {
+            document.getElementById('play_end_sequence_checkbox').checked = false;
+            document.getElementById('play_end_sequence_checkbox').disabled = true;
+        }
+        
+        create_multiguess_buttons();
+        init_game_type();
+    }
 
     
     
     // New game
     // =====================================
-    let num_events = 3; // Number of successive notes or chords in one game
-    let I_guesses = Array(num_events).fill(0);
-    let subI_guess = 0;
-    create_multiguess_buttons ();
-    if (num_events>1) {
-        document.getElementById('play_end_sequence_checkbox').checked = false;
-        document.getElementById('play_end_sequence_checkbox').disabled = true;
-    }
+    
+    
+    
     function new_game(new_I=true) {
         console.log("New game");
         console.log("---");
@@ -252,6 +252,7 @@
             subI_guess = 0;
             I_noteToGuess = I_guesses[0];
             console.log("I_guesses: ", I_guesses);
+            init_multiguess_buttons ()
         }
 
         if (game_type == 'chord' && document.getElementById('use_chord_inversion_checkbox').checked) {
@@ -268,20 +269,24 @@
         setTimeout(() => {  document.getElementById('start').innerHTML= "<span class=wondering_emoji></span><br>listen again?"; document.getElementById('start').className="wonder";}, 1000);
     } 
 
-
+ 
 
     function create_multiguess_buttons () {
-        
         document.getElementById("multi_guess_tracker_div").innerHTML = ""; // clean up
         for (i=0; i<num_events; i++) {
             let btn = document.createElement("button");    
             btn.id = "multi_guess_tracker_" + i;
-            btn.className = "tracker";
-            
             btn.disabled = "disabled";
             document.getElementById("multi_guess_tracker_div").appendChild(btn);
         }   
-        
+        init_multiguess_buttons ()
+    }
+
+    function init_multiguess_buttons () {
+        for (i=0; i<num_events; i++) {
+            let btn = document.getElementById("multi_guess_tracker_" + i);
+            btn.className = "tracker";
+        }
     }
 
     // Start sequence
