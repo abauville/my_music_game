@@ -88,6 +88,7 @@
             <li> Implement several notes to guess</li>
             <li> Start plays several notes </li>
             <li>Answer checks one note at a time and update call set_answer_class. Only at the end of the sequence, it will call new_game</li>
+            <li>n (number of notes to guess) little circles that fill up blue or red once a note is guessed correctly or incorrectly, resp.</li>
             <!-- <li> Implement the chord prog game</li> -->
 
             <!-- <li>Use the chord progression table</li> -->
@@ -116,9 +117,9 @@
 
 </html>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.32/Tone.js"></script>
-<script src="scripts/sound.js"></script>
-<script src="scripts/synths.js"></script>
 <script src="scripts/utils.js"></script>
+<script src="scripts/synths.js"></script>
+<script src="scripts/play.js"></script>
 <script src="scripts/game_logic.js"></script>
 <script>
     
@@ -216,9 +217,10 @@
         if (new_I) {
             console.log("probas: ", probabilities);
             I_noteToGuess = getRandomIntWithWeights(probabilities); // random number
-            // for (i=0; i<num_events; i++) {
-            //     I_guesses[i] = getRandomIntWithWeights(probabilities); // random number
-            // }
+            for (i=0; i<num_events; i++) {
+                I_guesses[i] = getRandomIntWithWeights(probabilities); // random number
+            }
+            console.log("I_guesses: ", I_guesses);
         }
 
         if (game_type == 'chord' && document.getElementById('use_chord_inversion_checkbox').checked) {
@@ -231,10 +233,58 @@
         // play note
         set_button_answer_class(I_noteToGuess);    
         elem = document.getElementsByName("note")[I_noteToGuess];
+        // play_start_sequence();
         play_note(elem, '4n', play_sound=true);
         
         setTimeout(() => {  document.getElementById('start').innerHTML= "<span class=wondering_emoji></span><br>listen again?"; document.getElementById('start').className="wonder";}, 1000);
     } 
+
+    // Start sequence
+    // =====================================
+    function play_start_sequence () {
+    console.log("end sequence")
+    let wait_time=0;
+    let now = Tone.now()
+    let note_seq = [];
+    let indices = [];
+    let note_length = 0.75;
+
+    let i_end, i_mod;
+    if (I_noteToGuess<4) {
+        i_end = -1;  i_mod = -1;
+    } else {
+        i_end =8;  i_mod = 1;   
+    }
+
+    // for (let i=I_noteToGuess; i!==i_end; i+=i_mod) {
+    //     console.log(i);
+    //     indices.push(i);
+    //     note_seq.push([wait_time, note_names[i]]);
+    //     wait_time+=note_length;
+    // }
+    
+    let counter = 0
+    const seq = new Tone.Part(
+        (time, note_ind) => {
+            // synthRight.triggerAttackRelease(note, 0.8*note_length, time);
+            console.log("start seq event!!", counter, time, note_ind, note_names[note_ind]);
+            elem = document.getElementsByName("note")[note_ind];
+            play_note(elem, 0.8*note_length, play_sound=true, time);
+            // let cl = document.getElementById(notes[indices[counter]]).classList;
+            // if (cl.contains("wrong_answer")) {
+            //     document.getElementById(notes[indices[counter]]).className = "note sequence";
+            // }
+            counter++;
+        }, 
+        // note_seq
+        I_guesses.map((x,i) => [i*note_length, I_guesses[i]]),
+    ).start();
+    console.log(Tone.Transport.state);
+    
+    return Tone.Transport.toSeconds(wait_time+1.0)*1000
+}
+
+
 
     // Answer
     // =====================================
