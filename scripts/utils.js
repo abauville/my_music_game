@@ -6,11 +6,12 @@ function getRandomInt(max) {
 
 function getRandomIntWithWeights(weights) {
     let sum = arrSum(weights);
-    let cumsum_weights = arrCumSum(probabilities);
+    let cumsum_weights = arrCumSum(weights);
     let random_float = Math.random() * sum
     // console.log("random dfloat", random_float);
     for (let i=0; i<weights.length; i++) {
         if (random_float<cumsum_weights[i]) {
+            // console.log("i_random:", i);
             return i;
         }
     }
