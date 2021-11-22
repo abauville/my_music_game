@@ -1,3 +1,4 @@
+
 // Game type
 // =====================================
 function switch_game_type () {
@@ -169,9 +170,9 @@ function play_cadence() {
             synthRight.triggerAttackRelease(note, 0.8*note_length, time);                
         }, 
         [[note_length*0, ['E3', 'E4', 'G4', 'C5']], 
-            [note_length*1, ['F3', 'D4', 'A4', 'C5']],
-            [note_length*2, ['G3', 'D4', 'G4', 'B4']],
-            [note_length*3, ['C3', 'E4', 'G4', 'C5']]]
+         [note_length*1, ['F3', 'D4', 'A4', 'C5']],
+         [note_length*2, ['G3', 'D4', 'G4', 'B4']],
+         [note_length*3, ['C3', 'E4', 'G4', 'C5']]]
     ).start();        
 }
 
