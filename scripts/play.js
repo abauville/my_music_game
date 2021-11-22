@@ -38,15 +38,15 @@ function play_note(elem, note_length, opt={}) {
         play_sound = options['play_sound']
     }
 
-    console.log("play_sound:", play_sound);
+    // console.log("play_sound:", play_sound);
 
 
 
     if (play_sound) {
         let this_note = elem.dataset.note.split(' ');
         let root_note = elem.dataset.rootnote;
-        console.log("this note: ", this_note);
-        console.log("root note: ", root_note);
+        // console.log("this note: ", this_note);
+        // console.log("root note: ", root_note);
         synth.triggerAttackRelease(this_note, note_length, options['time']);
         if (document.getElementById('play_bass_checkbox').checked) {
             synthBass.triggerAttackRelease(root_note, note_length, options['time']);

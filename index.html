@@ -89,6 +89,8 @@
             <li> Start plays several notes </li>
             <li>Answer checks one note at a time and update call set_answer_class. Only at the end of the sequence, it will call new_game</li>
             <li>n (number of notes to guess) little circles that fill up blue or red once a note is guessed correctly or incorrectly, resp.</li>
+            <li> If num_events>1 uncheck sequence back to do</li>
+            <li> the short wait when guessing several notes is not the most elegant</li>
             <!-- <li> Implement the chord prog game</li> -->
 
             <!-- <li>Use the chord progression table</li> -->
@@ -193,7 +195,7 @@
     function logKey(e) {
         let textContent = ` ${e.code}`;
         key = Number(`${e.key}`);
-        console.log(textContent, key);
+        // console.log(textContent, key);
         document.getElementById(notes[key-1]).onmousedown();
     }
 
@@ -204,6 +206,11 @@
     // =====================================
     let num_events = 3; // Number of successive notes or chords in one game
     let I_guesses = Array(num_events).fill(0);
+    let subI_guess = 0;
+    if (num_events>1) {
+        document.getElementById('play_end_sequence_checkbox').checked = false;
+        document.getElementById('play_end_sequence_checkbox').disabled = true;
+    }
     function new_game(new_I=true) {
         console.log("New game");
         console.log("---");
@@ -219,6 +226,7 @@
             for (i=0; i<num_events; i++) {
                 I_guesses[i] = getRandomIntWithWeights(probabilities); // random number
             }
+            subI_guess = 0;
             I_noteToGuess = I_guesses[0];
             console.log("I_guesses: ", I_guesses);
         }
@@ -287,9 +295,22 @@
                 play_note(this, '4n');
                 wait_time = 1.0*1000.0;
             } 
-            setTimeout(() => {  new_game(); }, wait_time);
+
+            this.classList.add("revealed"); 
+            subI_guess++;
+            if (subI_guess<I_guesses.length) {
+                I_noteToGuess = I_guesses[subI_guess];
+                setTimeout(() => {  set_button_answer_class(I_noteToGuess); }, 300);
+                
+            } else {
+                setTimeout(() => {  new_game(); }, wait_time);
+            }
+            console.log("I_guesses:", I_guesses);
+            console.log("I_noteToGuess", I_noteToGuess);
+
         } else if (this.classList.contains("wrong_answer")) {
             // Animation
+            this.classList.add("revealed"); 
             document.getElementById('start').innerHTML= "(＞﹏＜)";
             document.getElementById('start').className="wrong_answer"; 
             document.getElementById('start').style.animation="none"; // next 3 lines restart animatino
@@ -302,7 +323,7 @@
             play_note(this, '4n', {'play_sound':true});
             console.log("The class of this button is unknown, or unset.")
         }
-        this.classList.add("revealed"); 
+        // this.classList.add("revealed"); 
     } 
     
     
