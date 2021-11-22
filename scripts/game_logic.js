@@ -73,7 +73,7 @@ function set_button_answer_class(I_right){
     for (let i=0; i<notes.length;i++) {
         let elem = document.getElementById(notes[i]);
         elem.className = "note"; // clear the classList
-        if (i==I_right || i==I_right+7){
+        if (i==I_right){
             elem.classList.add("right_answer");
             if (game_type == 'note') {
                 elem.dataset.note = note_names[I_right];

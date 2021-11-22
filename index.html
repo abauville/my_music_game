@@ -202,7 +202,7 @@
     
     // New game
     // =====================================
-    let num_events = 4; // Number of successive notes or chords in one game
+    let num_events = 3; // Number of successive notes or chords in one game
     let I_guesses = Array(num_events).fill(0);
     function new_game(new_I=true) {
         console.log("New game");
@@ -216,10 +216,10 @@
 
         if (new_I) {
             console.log("probas: ", probabilities);
-            I_noteToGuess = getRandomIntWithWeights(probabilities); // random number
             for (i=0; i<num_events; i++) {
                 I_guesses[i] = getRandomIntWithWeights(probabilities); // random number
             }
+            I_noteToGuess = I_guesses[0];
             console.log("I_guesses: ", I_guesses);
         }
 
@@ -232,9 +232,7 @@
         
         // play note
         set_button_answer_class(I_noteToGuess);    
-        elem = document.getElementsByName("note")[I_noteToGuess];
-        // play_start_sequence();
-        play_note(elem, '4n', play_sound=true);
+        play_start_sequence();
         
         setTimeout(() => {  document.getElementById('start').innerHTML= "<span class=wondering_emoji></span><br>listen again?"; document.getElementById('start').className="wonder";}, 1000);
     } 
@@ -256,24 +254,12 @@
         i_end =8;  i_mod = 1;   
     }
 
-    // for (let i=I_noteToGuess; i!==i_end; i+=i_mod) {
-    //     console.log(i);
-    //     indices.push(i);
-    //     note_seq.push([wait_time, note_names[i]]);
-    //     wait_time+=note_length;
-    // }
-    
     let counter = 0
     const seq = new Tone.Part(
         (time, note_ind) => {
-            // synthRight.triggerAttackRelease(note, 0.8*note_length, time);
             console.log("start seq event!!", counter, time, note_ind, note_names[note_ind]);
             elem = document.getElementsByName("note")[note_ind];
-            play_note(elem, 0.8*note_length, play_sound=true, time);
-            // let cl = document.getElementById(notes[indices[counter]]).classList;
-            // if (cl.contains("wrong_answer")) {
-            //     document.getElementById(notes[indices[counter]]).className = "note sequence";
-            // }
+            play_note(elem, 0.8*note_length, {play_sound:true, time:time, synth:synthRight});
             counter++;
         }, 
         // note_seq
@@ -313,11 +299,11 @@
             play_note(this, '4n');
             
         } else {
-            play_note(this, '4n', play_sound=true);
+            play_note(this, '4n', {'play_sound':true});
             console.log("The class of this button is unknown, or unset.")
         }
         this.classList.add("revealed"); 
-    }
+    } 
     
     
     

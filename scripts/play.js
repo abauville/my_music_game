@@ -1,29 +1,55 @@
 // Note
 // =====================================
-function play_note(elem, note_length='4n', play_sound=null, time=Tone.now()) {
-    console.log("play_note: ", play_sound)
-    let this_note = elem.dataset.note.split(' ');
-    let rootnote = elem.dataset.rootnote;
+function play_note(elem, note_length, opt={}) {
+    // Default options
+    options = { 'synth':null,
+                'play_sound':null,
+                'time':Tone.now(),
+                }
+    
+    // Overwrite default with user input
+    for (let key in opt) {
+        if (!(key in options)) {
+            console.log("Error: the key:" + key + " is not a valid option for the function play_note.");
+        }
+        options[key] = opt[key];
+    }
+    
 
-    if (elem.classList.contains("right_answer")) {
-        synth = synthRight;
+    let synth;
+    if (options['synth']==null) {
+        if (elem.classList.contains("right_answer") || elem.classList.contains("sequence")) {
+            synth = synthRight;
+        } else {
+            synth = synthWrong;
+        }
     } else {
-        synth = synthWrong;
+        synth = options['synth'];
     }
 
-    if (play_sound == null) { // the default value allows the checkbox to be overriden (e.g. for the start button)
+    let play_sound;
+    if (options['play_sound'] == null) { // the default value allows the checkbox to be overriden (e.g. for the start button)
         if (document.getElementById('play_sound_checkbox').checked) {
             play_sound=true;
         } else {
             play_sound=false;
         }
+    } else {
+        play_sound = options['play_sound']
     }
 
+    console.log("play_sound:", play_sound);
+
+
+
     if (play_sound) {
-        
-        synth.triggerAttackRelease(this_note, note_length, time);
+        let this_note = elem.dataset.note.split(' ');
+        let root_note = elem.dataset.rootnote;
+        console.log("this note: ", this_note);
+        console.log("root note: ", root_note);
+        synth.triggerAttackRelease(this_note, note_length, options['time']);
         if (document.getElementById('play_bass_checkbox').checked) {
-            synthBass.triggerAttackRelease(rootnote, note_length, time);
+            synthBass.triggerAttackRelease(root_note, note_length, options['time']);
         }
     } 
 }
@@ -48,19 +74,22 @@ function play_end_sequence () {
     for (let i=I_noteToGuess; i!==i_end; i+=i_mod) {
         console.log(i);
         indices.push(i);
-        note_seq.push([wait_time, note_names[i]]);
+        // note_seq.push([wait_time, note_names[i]]);
+        note_seq.push([wait_time, i]);
         wait_time+=note_length;
     }
     
     let counter = 0
     const seq = new Tone.Part(
-        (time, note) => {
-            synthRight.triggerAttackRelease(note, 0.8*note_length, time);
-            console.log("event!!", counter, time, note);
+        (time, note_ind) => {
+            // synthRight.triggerAttackRelease(note, 0.8*note_length, time);
+            console.log("event!!", counter, time, note_ind);
+            elem = document.getElementsByName("note")[note_ind];
             let cl = document.getElementById(notes[indices[counter]]).classList;
             if (cl.contains("wrong_answer")) {
                 document.getElementById(notes[indices[counter]]).className = "note sequence";
             }
+            play_note(elem, 0.8*note_length, {play_sound:true, time:time});
             counter++;
         }, 
         note_seq,
