@@ -51,6 +51,7 @@
     <div id="start-div">
         <button id="start" class="start"></button>
     </div>
+    <div id="multi_guess_tracker_div"></div>
     <br>
     <div class='div-note'>
         <button id="do" class="note" name="note" data-note="" data-rootnote="" data-I="0">Do</button>
@@ -113,7 +114,27 @@
         </ul>        
     </div>
 
+    <style>
+        .tracker {
+            width: 15px;
+            height: 15px;
+            padding: 0px;
+            border-width: 1px;
+            border-radius: 50%;
+            border-style: inset;
+            margin:2px;
 
+        }
+        .tracker.right {
+            background-color: var(--right-answer-bg-color);
+            /* border-color: grey; */
+            border-color: var(--right-answer-bg-color);
+        }
+        .tracker.wrong {
+            background-color: var(--wrong-answer-bg-color);
+            border-color: var(--wrong-answer-bg-color);
+        }
+    </style>
     
 </body>
 
@@ -124,7 +145,8 @@
 <script src="scripts/play.js"></script>
 <script src="scripts/game_logic.js"></script>
 <script>
-    
+        
+
 
 
     // Useful variables
@@ -143,7 +165,7 @@
                         'E4 G4 B4', 
                         'F4 A4 C5', 
                         'G4 B4 D5', 
-                        'A4 C5 E5', 
+                        'A4 C5 E5',
                         'B4 D5 F5',
                         'C5 E5 G5' ];
     let chord_names = [...chord_names_root_position];
@@ -207,6 +229,7 @@
     let num_events = 3; // Number of successive notes or chords in one game
     let I_guesses = Array(num_events).fill(0);
     let subI_guess = 0;
+    create_multiguess_buttons ();
     if (num_events>1) {
         document.getElementById('play_end_sequence_checkbox').checked = false;
         document.getElementById('play_end_sequence_checkbox').disabled = true;
@@ -244,6 +267,22 @@
         
         setTimeout(() => {  document.getElementById('start').innerHTML= "<span class=wondering_emoji></span><br>listen again?"; document.getElementById('start').className="wonder";}, 1000);
     } 
+
+
+
+    function create_multiguess_buttons () {
+        
+        document.getElementById("multi_guess_tracker_div").innerHTML = ""; // clean up
+        for (i=0; i<num_events; i++) {
+            let btn = document.createElement("button");    
+            btn.id = "multi_guess_tracker_" + i;
+            btn.className = "tracker";
+            
+            btn.disabled = "disabled";
+            document.getElementById("multi_guess_tracker_div").appendChild(btn);
+        }   
+        
+    }
 
     // Start sequence
     // =====================================
@@ -297,6 +336,7 @@
             } 
 
             this.classList.add("revealed"); 
+            document.getElementById("multi_guess_tracker_" + subI_guess).className = "tracker right";
             subI_guess++;
             if (subI_guess<I_guesses.length) {
                 I_noteToGuess = I_guesses[subI_guess];
@@ -316,7 +356,7 @@
             document.getElementById('start').style.animation="none"; // next 3 lines restart animatino
             document.getElementById('start').offsetHeight;
             document.getElementById('start').style.animation=""; 
-
+            document.getElementById("multi_guess_tracker_" + subI_guess).className = "tracker wrong";
             play_note(this, '4n');
             
         } else {
