@@ -90,12 +90,19 @@
     <div style="text-align: left;">
         <h3>To do</h3>
         <ul>
-            <li> If num_events>1 uncheck sequence back to do</li>
-            <li> the short wait when guessing several notes is not the most elegant</li>
             <li> disable high DO for chord games</li>
+            
+            <li>limit num_events to 4 for the chord game</li>
+            <li>Use the chord progression table</li>
+
+            <li>use underlying chords for random melodies (like I programmed in python)</li>
+            <li>block keyboard input of unticked buttons</li>
+
+            <!-- <li> the short wait when guessing several notes is not the most elegant</li> -->
+            
             <!-- <li> Implement the chord prog game</li> -->
 
-            <!-- <li>Use the chord progression table</li> -->
+            
 
             <!-- <li> add a button to show/hide button selection </li> -->
             <!-- <li>Get the probability table for chord progressions</li> -->
@@ -202,7 +209,9 @@
         let textContent = ` ${e.code}`;
         key = Number(`${e.key}`);
         // console.log(textContent, key);
-        document.getElementById(notes[key-1]).onmousedown();
+        if (document.getElementById(notes[key-1]).disabled==false) {
+            document.getElementById(notes[key-1]).onmousedown();
+        }
     }
 
     document.getElementById("num_events_slider").oninput = init_num_events;
