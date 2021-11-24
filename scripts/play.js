@@ -116,4 +116,35 @@ function play_cadence() {
     ).start();        
 }
 
+// Start sequence
+    // =====================================
+    function play_start_sequence () {
+        console.log("end sequence")
+        let wait_time=0;
+        let now = Tone.now()
+        let note_seq = [];
+        let indices = [];
+        let note_length = 0.75;
 
+        let i_end, i_mod;
+        if (I_noteToGuess<4) {
+            i_end = -1;  i_mod = -1;
+        } else {
+            i_end =8;  i_mod = 1;   
+        }
+
+        let counter = 0
+        const seq = new Tone.Part(
+            (time, note_ind) => {
+                console.log("start seq event!!", counter, time, note_ind, note_names[note_ind]);
+                elem = document.getElementsByName("note")[note_ind];
+                play_note(elem, 0.8*note_length, {play_sound:true, time:time, synth:synthRight});
+                counter++;
+            }, 
+            // note_seq
+            I_guesses.map((x,i) => [i*note_length, I_guesses[i]]),
+        ).start();
+        console.log(Tone.Transport.state);
+        
+        return Tone.Transport.toSeconds(wait_time+1.0)*1000
+    }
