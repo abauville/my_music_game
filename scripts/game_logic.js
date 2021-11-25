@@ -3,7 +3,6 @@
 function switch_game_type () {
     if (this.checked) {
         game_type = this.value;
-        console.log("Here, ", game_type);
         init_game_type();
     }
 }
@@ -33,7 +32,7 @@ function init_game_type() {
         console.log("Error: unknown game type:", game_type);
     }
     answer_p.innerText =  this.value;
-    console.log("change game type");
+    // console.log("change game type");
     for (let i=0; i<notes.length;i++) {
         let m = midi_num[i];
         let elem = document.getElementById(notes[i])
@@ -57,7 +56,7 @@ function init_game_type() {
         
     }
     document.addEventListener('keypress', logKey);
-    console.log("game type: ", game_type);
+    // console.log("game type: ", game_type);
 }
 
 // Start
@@ -94,11 +93,9 @@ function set_button_answer_class(I_right){
 // Multi guesses logic
 // =====================================
 function init_num_events () {
-    console.log("init num_events");
     num_events = Number(this.value);
     I_guesses = Array(num_events).fill(0);
     document.getElementById("num_events_label").innerText = num_events;
-    console.log("num_events:", num_events);
     create_multiguess_buttons();
     init_game_type();    
 }

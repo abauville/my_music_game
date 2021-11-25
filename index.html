@@ -69,13 +69,13 @@
     </div>
     <div>
         <input type="checkbox" id="do_checkbox" name="note-select" class="note-select" checked>
-        <input type="checkbox" id="re_checkbox" name="note-select" class="note-select" checked>
-        <input type="checkbox" id="mi_checkbox" name="note-select" class="note-select" checked>
-        <input type="checkbox" id="fa_checkbox" name="note-select" class="note-select" checked>
-        <input type="checkbox" id="so_checkbox" name="note-select" class="note-select" checked>
-        <input type="checkbox" id="la_checkbox" name="note-select" class="note-select" checked>
-        <input type="checkbox" id="ti_checkbox" name="note-select" class="note-select" checked>
-        <input type="checkbox" id="DO_checkbox" name="note-select" class="note-select" checked>
+        <input type="checkbox" id="re_checkbox" name="note-select" class="note-select"> 
+        <input type="checkbox" id="mi_checkbox" name="note-select" class="note-select">
+        <input type="checkbox" id="fa_checkbox" name="note-select" class="note-select">
+        <input type="checkbox" id="so_checkbox" name="note-select" class="note-select">
+        <input type="checkbox" id="la_checkbox" name="note-select" class="note-select">
+        <input type="checkbox" id="ti_checkbox" name="note-select" class="note-select">
+        <input type="checkbox" id="DO_checkbox" name="note-select" class="note-select">
     </div>
 
     </br>
@@ -90,12 +90,14 @@
     <div style="text-align: left;">
         <h3>To do</h3>
         <ul>
+            <li>Fix the chords register</li>
             <li> disable high DO for chord games</li>
             
             <li>limit num_events to 4 for the chord game</li>
             <li>Use the chord progression table</li>
 
             <li>use underlying chords for random melodies (like I programmed in python)</li>
+            <li>connect synth to volume (to avoid saturation and control bass volume)</li>
             
 
             <!-- <li> the short wait when guessing several notes is not the most elegant</li> -->
@@ -183,7 +185,6 @@
         elem[i].onclick();
     }
 
-    console.log("There, ", game_type);
     document.getElementById('use_chord_inversion_checkbox').onchange = () => {chord_names = [...chord_names_root_position];};
 
     for (let i=0; i<notes.length;i++) {
@@ -194,7 +195,7 @@
             elem.onmousedown = answer;
             document.addEventListener('keypress', logKey);
             document.getElementById(notes[i] + '_checkbox').onchange = () => {
-                console.log("activate/deactivate " + notes[i], document.getElementById(notes[i] + '_checkbox').checked);
+                // console.log("activate/deactivate " + notes[i], document.getElementById(notes[i] + '_checkbox').checked);
                 if (document.getElementById(notes[i] + '_checkbox').checked) {
                     document.getElementById(notes[i]).disabled = false;
                     probabilities[i] = 1.0;
@@ -204,6 +205,7 @@
                 }
                 init_game_type()
             }
+            document.getElementById(notes[i] + '_checkbox').onchange()
     }
 
     function logKey(e) {
@@ -239,13 +241,13 @@
             I_noteToGuess = I_guesses[0];
             console.log("I_guesses: ", I_guesses);
             init_multiguess_buttons ()
-        }
-
-        if (game_type == 'chord' && document.getElementById('use_chord_inversion_checkbox').checked) {
-            current_chord = chord_names[I_noteToGuess];
-            chord_names[I_noteToGuess] = get_chord_inversion(previous_chord, current_chord);   
-            console.log("previous chord", previous_chord);
-            console.log("new chord", chord_names[I_noteToGuess]);         
+        
+            if (game_type == 'chord' && document.getElementById('use_chord_inversion_checkbox').checked) {
+                current_chord = chord_names[I_noteToGuess];
+                chord_names[I_noteToGuess] = get_chord_inversion(previous_chord, current_chord);   
+                console.log("previous chord", previous_chord);
+                console.log("new chord", chord_names[I_noteToGuess]);         
+            }
         }
         
         // play note
