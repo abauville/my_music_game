@@ -66,11 +66,16 @@
         }
     }
         
-
-    const synthBass  = new Tone.AMSynth().toDestination(); 
-    const synthRight = new Tone.PolySynth(Tone.FMSynth).toDestination(); 
-    const synthWrong = new Tone.PolySynth(Tone.FMSynth).toDestination(); 
+    const synth = new Tone.PolySynth();
+    const vol_main = new Tone.Volume(-8).toDestination();
+    const vol_bass = new Tone.Volume(-8).toDestination();
+    
+    const synthBass  = new Tone.AMSynth().connect(vol_bass); 
+    const synthRight = new Tone.PolySynth(Tone.FMSynth).connect(vol_main); 
+    const synthWrong = new Tone.PolySynth(Tone.FMSynth).connect(vol_main); 
     synthRight.set(synthRightDict); 
     synthWrong.set(synthWrongDict); 
     synthBass.set(synthBassDict); 
+
+
     
