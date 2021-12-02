@@ -69,13 +69,13 @@
     </div>
     <div>
         <input type="checkbox" id="do_checkbox" name="note-select" class="note-select" checked>
-        <input type="checkbox" id="re_checkbox" name="note-select" class="note-select"> 
-        <input type="checkbox" id="mi_checkbox" name="note-select" class="note-select">
-        <input type="checkbox" id="fa_checkbox" name="note-select" class="note-select">
-        <input type="checkbox" id="so_checkbox" name="note-select" class="note-select">
-        <input type="checkbox" id="la_checkbox" name="note-select" class="note-select">
-        <input type="checkbox" id="ti_checkbox" name="note-select" class="note-select">
-        <input type="checkbox" id="DO_checkbox" name="note-select" class="note-select">
+        <input type="checkbox" id="re_checkbox" name="note-select" class="note-select" checked>
+        <input type="checkbox" id="mi_checkbox" name="note-select" class="note-select" checked>
+        <input type="checkbox" id="fa_checkbox" name="note-select" class="note-select" checked>
+        <input type="checkbox" id="so_checkbox" name="note-select" class="note-select" checked>
+        <input type="checkbox" id="la_checkbox" name="note-select" class="note-select" checked>
+        <input type="checkbox" id="ti_checkbox" name="note-select" class="note-select" checked>
+        <input type="checkbox" id="DO_checkbox" name="note-select" class="note-select" checked>
     </div>
 
     </br>
@@ -90,15 +90,15 @@
     <div style="text-align: left;">
         <h3>To do</h3>
         <ul>
-            <li>Fix the chords register</li>
-            <li> disable high DO for chord games</li>
-            
-            <li>limit num_events to 4 for the chord game</li>
-            <li>Use the chord progression table</li>
-
+            <!-- <li>limit num_events to 4 for the chord game</li> -->
+            <!-- <li>Use the chord progression table</li> -->
+            <li>find why answer_p prints "undefined</li>
             <li>use underlying chords for random melodies (like I programmed in python)</li>
             <li>connect synth to volume (to avoid saturation and control bass volume)</li>
-            
+            <li>Have an option to always input the full sequence as an answer</li>
+            <li>Keep track of the score</li>
+            <!-- <li>If the answer tracker were selectable I could fill part any part of the answer</li> -->
+            <!-- <li>Have a way to save preferences or at least the last configuration</li> -->
 
             <!-- <li> the short wait when guessing several notes is not the most elegant</li> -->
             
@@ -203,7 +203,7 @@
                     document.getElementById(notes[i]).disabled = true;
                     probabilities[i] = 0.0;
                 }
-                init_game_type()
+                init_game_type();
             }
             document.getElementById(notes[i] + '_checkbox').onchange()
     }
