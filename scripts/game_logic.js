@@ -31,7 +31,10 @@ function init_game_type() {
     } else {
         console.log("Error: unknown game type:", game_type);
     }
-    answer_p.innerText =  this.value;
+    
+    answer_p.innerText =  game_type;
+    
+    
     // console.log("change game type");
     for (let i=0; i<notes.length;i++) {
         let m = midi_num[i];

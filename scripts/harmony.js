@@ -73,15 +73,7 @@ function get_chord_inversion(previous_chord, current_chord) {
         distFromC5 = currUpperNote-C5; // penalizes chord that are too high are too low in register
         console.log("=============")
         console.log("curr_inv init", curr_inv);
-        // if (distFromC5>7) {
-        //     console.log("chord too high");
-        //     curr_inv = curr_inv.map(x => x-12);
-             
-        // } else if (distFromC5<-8) { 
-        //     console.log("chord too low");
-        //     curr_inv = curr_inv.map(x => x+12);
-            
-        // }
+
         currUpperNote = curr_inv[2];
         distFromC5 = currUpperNote-C5;
         // console.log("distFromC5", distFromC5);
